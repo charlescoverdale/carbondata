@@ -160,15 +160,6 @@ summary(vrod$total_issuances)
 Downloads are cached to `tools::R_user_dir("carbondata", "cache")` by default. Subsequent calls are instant. Override the location with `options(carbondata.cache_dir = "/path/to/dir")`. Use `co2_clear_cache()` to remove cached files.
 
 
-## Deliberately out of scope for v0.1.0
-
-- Direct Verra / Gold Standard / Puro.earth registry scraping (use VROD or OffsetsDB aggregators instead)
-- Korea ETS live prices (Korean-language; use `co2_icap_prices(jurisdiction = "Korea ETS")`)
-- China national and pilot ETS (Chinese-language, inconsistent formats)
-- Intraday carbon prices (paid only — ICE ECX, Databento, Platts)
-- Rating provider integrations (Sylvera, BeZero, MSCI Carbon Markets — gated APIs)
-
-
 ## Related packages
 
 | Package | Description |
