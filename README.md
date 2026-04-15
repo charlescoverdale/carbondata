@@ -5,25 +5,26 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 <!-- badges: end -->
 
-Unified R access to carbon market data: emissions trading systems, voluntary carbon credits, and global carbon pricing.
+Access carbon market data in R. Emissions trading system prices and verified emissions, voluntary carbon credit registrations and retirements, and global carbon pricing data from compliance and voluntary markets worldwide.
 
 
-## The world has ambitious carbon markets. The data is everywhere.
+## Carbon markets now price 12 billion tonnes a year. The data is a mess.
 
-The world has never been closer to putting a serious price on greenhouse gas emissions. Around 12 billion tonnes of CO2-equivalent are now under some form of carbon price (ETS or tax), covering roughly 24% of global emissions. The EU ETS alone prices ~40% of EU emissions and generates ~EUR 40 billion a year in auction revenue. Voluntary carbon markets have issued over 2 billion credits since 1996.
+Carbon pricing has gone from a niche instrument to a systemic part of global climate policy. Around 12 billion tonnes of CO2-equivalent are now covered by some form of carbon price, about 24% of global emissions. The EU ETS alone prices ~40% of EU emissions and generates roughly EUR 40 billion a year in auction revenue. Voluntary carbon markets have issued over 2 billion credits since 1996, and Article 6 of the Paris Agreement is bringing a new wave of international carbon trading online.
 
-The catch is that the data is spread across dozens of jurisdictions, agencies, and registries, each with its own format:
+The catch is that the data is scattered across dozens of jurisdictions, agencies, and registries, each with its own format, access pattern, and quirks:
 
-- **EU ETS** publishes verified emissions via the European Environment Agency, auction prices via EEX, and installation registries via DG CLIMA, all as bulk CSV/XLSX downloads
-- **UK ETS** publishes via the UK Emissions Trading Registry reports service
-- **RGGI** uses its own COATS tracking system
-- **California Cap-and-Trade** is documented by the California Air Resources Board
-- **New Zealand, Korea, China** each run their own ETS with separate reporting
-- **Voluntary registries** (Verra, Gold Standard, ACR, CAR, Puro.earth) each maintain their own registries with no common API
-- **Aggregators** (ICAP, World Bank Carbon Pricing Dashboard, RFF) publish curated cross-market series
-- **Emerging** (CAD Trust) provides a harmonised API but is still stabilising
+- **EU ETS** publishes verified emissions and allocations via the DG CLIMA Union Registry as XLSX files with year-specific UUIDs, and auction prices via EEX as per-year XLSX reports
+- **UK Emissions Trading Registry** publishes compliance and allocation reports as XLSX, with date-stamped filenames that change on every republication
+- **RGGI** publishes per-state allowance distributions as XLSX on a stable year-parameterised URL, but clearing prices only as per-auction PDFs
+- **California Air Resources Board** serves auction prices and caps as stable CSVs from `ww2.arb.ca.gov`
+- **ICAP Allowance Price Explorer** exposes cross-ETS prices via an undocumented but stable JSON endpoint
+- **World Bank Carbon Pricing Dashboard** publishes an XLSX twice a year, with a filename that encodes the release date
+- **RFF World Carbon Pricing Database** lives on GitHub as per-country CSVs in version-stamped folders
+- **Berkeley VROD** aggregates five voluntary registries into a bimonthly XLSX release
+- **CarbonPlan OffsetsDB** maintains daily parquet snapshots of voluntary credits in a public S3 bucket (the REST API was deprecated in 2026)
 
-`carbondata` wraps the stable, free, API-accessible sources through a consistent R interface.
+`carbondata` wraps the stable, free, API-accessible sources through a consistent R interface, handling URL resolution, caching, and schema normalisation so you can get on with the analysis.
 
 
 ## Installation
