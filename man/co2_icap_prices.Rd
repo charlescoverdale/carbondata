@@ -4,33 +4,28 @@
 \alias{co2_icap_prices}
 \title{ICAP Allowance Price Explorer}
 \usage{
-co2_icap_prices(jurisdiction = NULL, from = NULL, to = NULL, refresh = FALSE)
+co2_icap_prices(jurisdiction = NULL, refresh = FALSE)
 }
 \arguments{
-\item{jurisdiction}{Optional character vector of jurisdictions
-(e.g. \code{c("EU ETS", "UK ETS", "RGGI")}). See
-\url{https://icapcarbonaction.com/en/ets-prices} for the full list.}
-
-\item{from, to}{Optional. Date range (YYYY-MM-DD).}
+\item{jurisdiction}{Optional character vector. Filter by
+jurisdiction name (e.g. \code{c("Regional Greenhouse Gas Initiative", "EU ETS")}). When \code{NULL}, returns all.}
 
 \item{refresh}{Re-download? Default \code{FALSE}.}
 }
 \value{
-A data frame with \code{date}, \code{jurisdiction}, \code{price_usd},
-\code{currency_native}, \code{price_native}.
+A data frame with \code{date}, \code{jurisdiction}, \code{market_type}
+(\code{"primary"} auction or \code{"secondary"}), \code{price}, and \code{currency}.
 }
 \description{
-Fetches allowance prices across the world's Emissions Trading
-Systems from the International Carbon Action Partnership (ICAP)
-Allowance Price Explorer. Covers 20+ jurisdictions including the
-EU, UK, California, RGGI, New Zealand, Korea, China, and others.
-Data is curated quarterly by ICAP.
+Fetches allowance prices across 20+ Emissions Trading Systems from
+the International Carbon Action Partnership (ICAP) Allowance Price
+Explorer. Covers EU ETS, UK ETS, California, RGGI, New Zealand,
+Korea, and other jurisdictions with auction and secondary-market
+prices where available.
 }
 \examples{
 \dontrun{
-op <- options(carbondata.cache_dir = tempdir())
-prices <- co2_icap_prices(jurisdiction = c("EU ETS", "UK ETS"))
-options(op)
+prices <- co2_icap_prices(jurisdiction = "EU ETS")
 }
 }
 \seealso{

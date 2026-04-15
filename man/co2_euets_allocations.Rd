@@ -4,35 +4,45 @@
 \alias{co2_euets_allocations}
 \title{EU ETS free allowance allocations}
 \usage{
-co2_euets_allocations(country = NULL, year = NULL, refresh = FALSE)
+co2_euets_allocations(
+  country = NULL,
+  year = NULL,
+  file_year = NULL,
+  refresh = FALSE
+)
 }
 \arguments{
-\item{country}{Optional two-letter country codes.}
+\item{country}{Optional character vector of two-letter registry
+codes to filter (e.g. \code{c("DE", "FR", "PL")}).}
 
-\item{year}{Optional integer years.}
+\item{year}{Optional integer vector of emissions years. When
+\code{NULL}, returns all years in the latest published file. Note
+that the file year (e.g. "2025") refers to publication year;
+emissions data covers calendar years up to publication year -1.}
 
-\item{refresh}{Re-download? Default \code{FALSE}.}
+\item{file_year}{Publication year of the DG CLIMA file to use.
+Default is the latest year available in the package (see
+\code{\link[=co2_euets_files]{co2_euets_files()}}).}
+
+\item{refresh}{Logical. Re-download? Default \code{FALSE}.}
 }
 \value{
-A data frame with \code{country}, \code{year}, \code{installation_id},
-\code{allocated_eua}, plus metadata.
+A data frame with \code{country}, \code{installation_id}, \code{year},
+\code{allocation_eua}.
 }
 \description{
-Fetches the free allocation of EU Allowances (EUAs) to installations
-under the EU Emissions Trading System. Free allocation has declined
-over successive phases and is scheduled for further phase-out under
-the Carbon Border Adjustment Mechanism (CBAM).
+Returns free allowance allocations per installation per year.
+Same source file as \code{\link[=co2_euets_emissions]{co2_euets_emissions()}}.
 }
 \examples{
 \dontrun{
-op <- options(carbondata.cache_dir = tempdir())
-alloc <- co2_euets_allocations(country = "DE", year = 2022)
-options(op)
+alloc <- co2_euets_allocations(country = "DE")
 }
 }
 \seealso{
 Other EU ETS: 
 \code{\link{co2_euets_emissions}()},
+\code{\link{co2_euets_files}()},
 \code{\link{co2_euets_installations}()},
 \code{\link{co2_euets_price}()},
 \code{\link{co2_euets_surrendered}()}

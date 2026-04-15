@@ -4,37 +4,25 @@
 \alias{co2_vrod}
 \title{Berkeley Voluntary Registry Offsets Database}
 \usage{
-co2_vrod(registry = NULL, project_type = NULL, country = NULL, refresh = FALSE)
+co2_vrod(refresh = FALSE)
 }
 \arguments{
-\item{registry}{Optional character. Filter by one or more
-registries: \code{"Verra"}, \code{"Gold Standard"}, \code{"ACR"}, \code{"CAR"},
-\code{"ART TREES"}.}
-
-\item{project_type}{Optional character. Filter by project type
-(e.g. \code{"Forestry"}, \code{"Renewable Energy"}, \code{"Household Devices"}).}
-
-\item{country}{Optional character vector of country names.}
-
-\item{refresh}{Re-download? Default \code{FALSE}.}
+\item{refresh}{Re-download? Default \code{FALSE}. Each release has a
+date-stamped filename; the package scrapes the landing page to
+find the latest release on each call unless a cached copy exists.}
 }
 \value{
-A data frame with project-level fields: \code{project_id},
-\code{registry}, \code{project_name}, \code{country}, \code{project_type},
-\code{methodology}, \code{total_issuances}, \code{total_retirements}, plus
-metadata.
+A data frame of project-level data.
 }
 \description{
-Fetches the Berkeley Voluntary Registry Offsets Database, a
-project-level aggregator covering Verra (VCS), Gold Standard,
-American Carbon Registry (ACR), Climate Action Reserve (CAR), and
-ART TREES. Data is released quarterly under CC BY 4.0.
+Fetches the Berkeley GSPP Voluntary Registry Offsets Database, an
+aggregator of Verra, Gold Standard, ACR, CAR, and ART TREES
+project registrations and issuances. Released bimonthly under
+CC BY 4.0.
 }
 \examples{
 \dontrun{
-op <- options(carbondata.cache_dir = tempdir())
-vrod <- co2_vrod(registry = "Verra", project_type = "Forestry")
-options(op)
+vrod <- co2_vrod()
 }
 }
 \seealso{

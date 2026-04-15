@@ -2,45 +2,37 @@
 % Please edit documentation in R/euets.R
 \name{co2_euets_price}
 \alias{co2_euets_price}
-\title{EU ETS allowance (EUA) price}
+\title{EU ETS allowance (EUA) auction settlement prices}
 \usage{
-co2_euets_price(from = NULL, to = NULL, type = c("auction"), refresh = FALSE)
+co2_euets_price(from = NULL, to = NULL, year = NULL, refresh = FALSE)
 }
 \arguments{
-\item{from, to}{Optional character or Date. Date range
-(YYYY-MM-DD).}
+\item{from, to}{Optional character or Date. Date range.}
 
-\item{type}{Character. \code{"auction"} (default) returns primary market
-auction settlement prices. Future versions may support additional
-types.}
+\item{year}{Optional integer year. If supplied, only the file for
+that year is fetched (faster than \code{from}/\code{to}).}
 
 \item{refresh}{Re-download? Default \code{FALSE}.}
 }
 \value{
-A data frame with columns \code{date}, \code{price_eur}, \code{venue},
-\code{volume_t}.
+A data frame with \code{date}, \code{auction_name}, \code{contract},
+\code{status}, \code{price_eur}, \code{min_bid_eur}, \code{max_bid_eur}, \code{volume_t}.
 }
 \description{
-Fetches EU Allowance (EUA) auction settlement prices from the
-European Energy Exchange (EEX). Primary market auctions are held
-several times per week; spot and futures prices trade continuously
-on ICE ECX and EEX.
-}
-\details{
-Only settlement prices from the free auction reports are returned
-here; intraday and futures curves require paid data feeds.
+Fetches EU Allowance (EUA) primary-auction settlement prices from
+the EEX public auction report. Auctions are held several times per
+week; each year's file accumulates all auctions for that year.
 }
 \examples{
 \dontrun{
-op <- options(carbondata.cache_dir = tempdir())
-prices <- co2_euets_price(from = "2024-01-01")
-options(op)
+prices <- co2_euets_price(year = 2025)
 }
 }
 \seealso{
 Other EU ETS: 
 \code{\link{co2_euets_allocations}()},
 \code{\link{co2_euets_emissions}()},
+\code{\link{co2_euets_files}()},
 \code{\link{co2_euets_installations}()},
 \code{\link{co2_euets_surrendered}()}
 }

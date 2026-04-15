@@ -4,32 +4,26 @@
 \alias{co2_world_bank}
 \title{World Bank Carbon Pricing Dashboard}
 \usage{
-co2_world_bank(year = NULL, instrument = NULL, refresh = FALSE)
+co2_world_bank(refresh = FALSE)
 }
 \arguments{
-\item{year}{Optional integer year to filter by.}
-
-\item{instrument}{Optional character: \code{"ets"}, \code{"tax"}, or NULL
-for both.}
-
 \item{refresh}{Re-download? Default \code{FALSE}.}
 }
 \value{
-A data frame with columns \code{year}, \code{jurisdiction},
-\code{instrument_type}, \code{name}, \code{price_usd_per_tco2e},
-\code{emissions_covered_pct}, \code{revenue_usd_millions}.
+A data frame.
 }
 \description{
-Fetches global carbon pricing data (carbon taxes and ETS) from the
-World Bank Carbon Pricing Dashboard. Covers instruments, prices,
-emissions coverage, and revenue for over 70 carbon pricing
-initiatives worldwide.
+Fetches the World Bank Carbon Pricing Dashboard Excel file, which
+covers 70+ carbon pricing initiatives worldwide (carbon taxes +
+ETS) with price, coverage, and revenue data.
+}
+\details{
+The World Bank publishes a dated file every 6-12 months. This
+function scrapes the landing page to find the latest release.
 }
 \examples{
 \dontrun{
-op <- options(carbondata.cache_dir = tempdir())
-wb <- co2_world_bank(year = 2024)
-options(op)
+wb <- co2_world_bank()
 }
 }
 \seealso{

@@ -7,28 +7,28 @@
 co2_euets_installations(country = NULL, refresh = FALSE)
 }
 \arguments{
-\item{country}{Optional two-letter country codes.}
+\item{country}{Optional two-letter registry codes.}
 
 \item{refresh}{Re-download? Default \code{FALSE}.}
 }
 \value{
-A data frame of installations.
+A data frame.
 }
 \description{
-Returns the registry of EU ETS installations with metadata:
-operator name, activity type, country, permitted since, etc.
+Returns the registry of stationary EU ETS installations with
+operator name, activity type, country, city, and permit details.
+Sourced from the DG CLIMA Union Registry snapshot.
 }
 \examples{
 \dontrun{
-op <- options(carbondata.cache_dir = tempdir())
 inst <- co2_euets_installations(country = "PL")
-options(op)
 }
 }
 \seealso{
 Other EU ETS: 
 \code{\link{co2_euets_allocations}()},
 \code{\link{co2_euets_emissions}()},
+\code{\link{co2_euets_files}()},
 \code{\link{co2_euets_price}()},
 \code{\link{co2_euets_surrendered}()}
 }

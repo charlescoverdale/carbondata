@@ -23,9 +23,7 @@ co2_validate_year <- function(year, min_year = 1990L) {
   current_year <- as.integer(format(Sys.Date(), "%Y"))
   bad <- year < min_year | year > current_year
   if (any(bad)) {
-    cli_abort(
-      "{.arg year} must be between {min_year} and {current_year}."
-    )
+    cli_abort("{.arg year} must be between {min_year} and {current_year}.")
   }
   year
 }
@@ -35,19 +33,19 @@ co2_validate_date <- function(x, arg = "date") {
   if (is.null(x)) return(NULL)
   d <- tryCatch(as.Date(x), error = function(e) NA)
   if (is.na(d)) {
-    cli_abort(
-      "{.arg {arg}} must be a date or ISO string (YYYY-MM-DD)."
-    )
+    cli_abort("{.arg {arg}} must be a date or ISO string (YYYY-MM-DD).")
   }
   format(d, "%Y-%m-%d")
 }
 
-# Build a standard httr2 request with user agent and retry behaviour
+# Build a standard httr2 request with Mozilla User-Agent (required by some
+# EC servers like climate.ec.europa.eu which return 429 to bare curl UA),
+# retry behaviour, and modest throttling.
 co2_request <- function(url) {
   req <- httr2::request(url)
   req <- httr2::req_user_agent(
     req,
-    "carbondata R package (https://github.com/charlescoverdale/carbondata)"
+    "Mozilla/5.0 (compatible; carbondata R package; https://github.com/charlescoverdale/carbondata)"
   )
   req <- httr2::req_retry(
     req,
@@ -62,20 +60,19 @@ co2_request <- function(url) {
 }
 
 # Download a URL to a file with caching
-co2_download <- function(url, dest, refresh = FALSE, auth = NULL) {
+co2_download <- function(url, dest, refresh = FALSE) {
   if (file.exists(dest) && !refresh) {
     return(dest)
   }
   req <- co2_request(url)
-  if (!is.null(auth)) {
-    req <- httr2::req_auth_basic(req, auth$user, auth$password)
-  }
   resp <- tryCatch(
     httr2::req_perform(req, path = dest),
     error = function(e) {
       cli_abort(c(
         "Failed to download {.url {url}}.",
-        "x" = conditionMessage(e)
+        "x" = conditionMessage(e),
+        "i" = "If the publisher has moved the file, pass {.code refresh = TRUE}",
+        " " = "or report at https://github.com/charlescoverdale/carbondata/issues."
       ))
     }
   )
@@ -86,9 +83,33 @@ co2_download <- function(url, dest, refresh = FALSE, auth = NULL) {
   dest
 }
 
-# Convert a list of parsed JSON records to a data frame. Coerces all
-# values to character to avoid rbind class-mismatch errors when
-# different records have different types for the same field.
+# Fetch HTML from a landing page and extract download URLs matching a regex.
+# Used for sources that publish date-stamped filenames on a stable landing
+# page (GOV.UK, CARB, Berkeley GSPP).
+co2_scrape_links <- function(page_url, pattern) {
+  req <- co2_request(page_url)
+  resp <- tryCatch(
+    httr2::req_perform(req),
+    error = function(e) {
+      cli_abort(c(
+        "Failed to reach landing page {.url {page_url}}.",
+        "x" = conditionMessage(e)
+      ))
+    }
+  )
+  if (httr2::resp_status(resp) >= 400L) {
+    cli_abort("Landing page returned HTTP {httr2::resp_status(resp)}.")
+  }
+  html <- httr2::resp_body_string(resp)
+  hrefs <- regmatches(html, gregexpr('href="[^"]+"', html))[[1L]]
+  hrefs <- gsub('^href="|"$', "", hrefs)
+  hits <- grep(pattern, hrefs, value = TRUE)
+  # Resolve relative URLs
+  base_url <- sub("(https?://[^/]+).*", "\\1", page_url)
+  ifelse(grepl("^https?://", hits), hits, paste0(base_url, hits))
+}
+
+# Convert a list of parsed JSON records to a data frame
 co2_list_to_df <- function(items) {
   if (length(items) == 0L) return(data.frame())
   cols <- unique(unlist(lapply(items, names)))
@@ -116,4 +137,16 @@ co2_format_bytes <- function(x) {
       return(sprintf("%.1f %s", x, units[i]))
     }
   }
+}
+
+# Case-insensitive column picker for messy published datasets
+co2_pick <- function(df, patterns, default = NA_character_) {
+  n <- names(df)
+  for (p in patterns) {
+    hit <- n[tolower(n) == tolower(p)]
+    if (length(hit) > 0L) return(df[[hit[1L]]])
+    hit <- n[grepl(p, n, ignore.case = TRUE)]
+    if (length(hit) > 0L) return(df[[hit[1L]]])
+  }
+  rep(default, nrow(df))
 }

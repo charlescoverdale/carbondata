@@ -1,208 +1,241 @@
-# Compliance market data for UK ETS, RGGI, and California.
-# Each source publishes data in different formats (Excel, CSV) via
-# government websites. URLs are documented and maintained centrally
-# in this file so format shifts can be patched here.
+# Compliance carbon markets: UK ETS, RGGI, California.
 
-#' UK Emissions Trading Scheme data
+#' UK ETS verified emissions and surrenders
 #'
-#' Fetches data from the UK ETS, which replaced the UK's participation
-#' in the EU ETS from 1 January 2021. Coverage: power sector and
-#' energy-intensive industry within the UK.
+#' Fetches the UK Emissions Trading Scheme Section 4 compliance
+#' report (verified emissions and allowance surrenders per account
+#' per scheme year), published annually by the UK Emissions Trading
+#' Registry after the 30 April reconciliation deadline.
 #'
-#' @param type Character. `"price"` for UKA auction prices,
-#'   `"emissions"` for verified emissions, `"allocations"` for free
-#'   allocations.
-#' @param from,to Optional. Date range for price data.
-#' @param refresh Logical. Re-download? Default `FALSE`.
-#'
-#' @return A data frame. Columns depend on `type`.
-#'
+#' @param refresh Re-download? Default `FALSE`.
+#' @return A data frame with one row per account-year.
 #' @family compliance markets
 #' @export
 #' @examples
 #' \dontrun{
-#' op <- options(carbondata.cache_dir = tempdir())
-#' uka <- co2_ukets(type = "price", from = "2024-01-01")
-#' options(op)
+#' uk <- co2_ukets()
 #' }
-co2_ukets <- function(type = c("price", "emissions", "allocations"),
-                      from = NULL, to = NULL, refresh = FALSE) {
-  type <- match.arg(type)
-  from <- co2_validate_date(from, "from")
-  to   <- co2_validate_date(to, "to")
-
-  url <- switch(type,
-    price       = "https://www.eex.com/fileadmin/EEX/Downloads/Trading/Specifications/Emissions_Rights/EEX_UK_Allowance_Auctions_Results_History.csv",
-    emissions   = "https://assets.publishing.service.gov.uk/media/uk-ets-verified-emissions.csv",
-    allocations = "https://assets.publishing.service.gov.uk/media/uk-ets-allocations.csv"
-  )
-
-  filename <- paste0("ukets_", type, ".csv")
+co2_ukets <- function(refresh = FALSE) {
+  index_url <- "https://reports.view-emissions-trading-registry.service.gov.uk/ets-reports/section4/section4.html"
+  cli_inform(c("i" = "Resolving UK ETS Section 4 compliance report URL..."))
+  hits <- co2_scrape_links(index_url,
+                           "Compliance_Report_Emissions_and_Surrenders\\.xlsx$")
+  if (length(hits) == 0L) {
+    cli_abort(c(
+      "No UK ETS compliance report found on {.url {index_url}}.",
+      "i" = "The UK Emissions Trading Registry may have restructured its reports page."
+    ))
+  }
+  url <- hits[1L]
+  filename <- basename(url)
   dest <- file.path(co2_cache_dir(), filename)
   if (!file.exists(dest) || refresh) {
-    cli_inform(c("i" = "Downloading UK ETS {type} data..."))
+    cli_inform(c("i" = "Downloading {.file {filename}}..."))
     co2_download(url, dest, refresh = refresh)
   } else {
     cli_inform(c("i" = "Loading {.file {filename}} from cache."))
   }
-
-  df <- utils::read.csv(dest, stringsAsFactors = FALSE, check.names = FALSE)
-
-  if (type == "price") {
-    out <- .ukets_tidy_price(df)
-    if (!is.null(from)) out <- out[out$date >= as.Date(from), , drop = FALSE]
-    if (!is.null(to))   out <- out[out$date <= as.Date(to), , drop = FALSE]
-    return(out)
-  }
-  df
+  df <- readxl::read_excel(dest)
+  as.data.frame(df, stringsAsFactors = FALSE)
 }
 
-#' Regional Greenhouse Gas Initiative (RGGI) data
+#' UK ETS free allocations
 #'
-#' Fetches data from RGGI, the power-sector cap-and-trade program
-#' covering eleven US Northeast and Mid-Atlantic states. Data comes
-#' from the public COATS system.
+#' Fetches the UK ETS free-allocation table for stationary
+#' installations (OHA) published by DESNZ on GOV.UK. Filename
+#' includes a media GUID that changes when DESNZ republishes, so the
+#' package scrapes the stable publications landing page.
 #'
-#' @param type Character. `"price"` for auction clearing prices,
-#'   `"emissions"` for quarterly CO2 emissions, `"allowances"` for
-#'   allowance distribution.
-#' @param state Optional state abbreviation (e.g. `"NY"`, `"MA"`).
-#' @param from,to Optional. Date range.
+#' @param sector Character. `"installations"` (default) for stationary
+#'   installations, `"aviation"` for aviation allocations.
 #' @param refresh Re-download? Default `FALSE`.
-#'
-#' @return A data frame. Columns depend on `type`.
-#'
-#' @family compliance markets
-#' @export
-#' @examples
-#' \dontrun{
-#' op <- options(carbondata.cache_dir = tempdir())
-#' prices <- co2_rggi(type = "price")
-#' options(op)
-#' }
-co2_rggi <- function(type = c("price", "emissions", "allowances"),
-                     state = NULL, from = NULL, to = NULL,
-                     refresh = FALSE) {
-  type <- match.arg(type)
-  from <- co2_validate_date(from, "from")
-  to   <- co2_validate_date(to, "to")
-
-  url <- switch(type,
-    price       = "https://www.rggi.org/sites/default/files/Uploads/Auction-Materials/Auction_Prices_Volumes.csv",
-    emissions   = "https://rggi-coats.org/eats/rggi/data/RGGI_Summary_Emissions.csv",
-    allowances  = "https://www.rggi.org/sites/default/files/Uploads/Allowance-Distribution/Allowance_Distribution.csv"
-  )
-
-  filename <- paste0("rggi_", type, ".csv")
-  dest <- file.path(co2_cache_dir(), filename)
-  if (!file.exists(dest) || refresh) {
-    cli_inform(c("i" = "Downloading RGGI {type} data..."))
-    co2_download(url, dest, refresh = refresh)
-  } else {
-    cli_inform(c("i" = "Loading {.file {filename}} from cache."))
-  }
-
-  df <- utils::read.csv(dest, stringsAsFactors = FALSE, check.names = FALSE)
-
-  if (type == "price") {
-    out <- .rggi_tidy_price(df)
-    if (!is.null(from)) out <- out[out$date >= as.Date(from), , drop = FALSE]
-    if (!is.null(to))   out <- out[out$date <= as.Date(to), , drop = FALSE]
-    return(out)
-  }
-
-  if (!is.null(state) && "state" %in% names(df)) {
-    df <- df[toupper(df$state) == toupper(state), , drop = FALSE]
-  }
-  df
-}
-
-#' California Cap-and-Trade data
-#'
-#' Fetches data from the California Cap-and-Trade program operated
-#' by the California Air Resources Board (CARB). The program covers
-#' multi-sector emissions and holds quarterly joint auctions with
-#' Quebec under the Western Climate Initiative.
-#'
-#' @param type Character. `"price"` for joint CA/QC auction settlement
-#'   prices, `"emissions"` for covered-entity emissions,
-#'   `"auction"` for auction volumes.
-#' @param from,to Optional. Date range.
-#' @param refresh Re-download? Default `FALSE`.
-#'
 #' @return A data frame.
-#'
 #' @family compliance markets
 #' @export
 #' @examples
 #' \dontrun{
-#' op <- options(carbondata.cache_dir = tempdir())
-#' cca <- co2_california(type = "price")
-#' options(op)
+#' alloc <- co2_ukets_allocations()
 #' }
-co2_california <- function(type = c("price", "emissions", "auction"),
-                           from = NULL, to = NULL, refresh = FALSE) {
-  type <- match.arg(type)
-  from <- co2_validate_date(from, "from")
-  to   <- co2_validate_date(to, "to")
-
-  url <- switch(type,
-    price     = "https://ww2.arb.ca.gov/sites/default/files/classic/cc/capandtrade/auction/auction-settlement-results.csv",
-    emissions = "https://ww2.arb.ca.gov/sites/default/files/classic/cc/reporting/ghg-rep/ghg-reports/ghg-reports-emissions.csv",
-    auction   = "https://ww2.arb.ca.gov/sites/default/files/classic/cc/capandtrade/auction/auction-summary.csv"
+co2_ukets_allocations <- function(sector = c("installations", "aviation"),
+                                  refresh = FALSE) {
+  sector <- match.arg(sector)
+  page <- switch(sector,
+    installations = "https://www.gov.uk/government/publications/uk-ets-allocation-table-for-operators-of-installations",
+    aviation      = "https://www.gov.uk/government/publications/uk-ets-aviation-allocation-table"
   )
-
-  filename <- paste0("california_", type, ".csv")
+  cli_inform(c("i" = "Resolving UK ETS {sector} allocation URL..."))
+  pattern <- if (sector == "installations") {
+    "uk-ets-allocation-table-[a-z]+-\\d{4}\\.(xlsx|csv)$"
+  } else {
+    "uk-ets-aviation-allocation-table-[a-z]+-\\d{4}\\.(xlsx|csv)$"
+  }
+  hits <- co2_scrape_links(page, pattern)
+  if (length(hits) == 0L) {
+    cli_abort("No UK ETS {sector} allocation file found on {.url {page}}.")
+  }
+  url <- hits[1L]
+  filename <- basename(url)
   dest <- file.path(co2_cache_dir(), filename)
   if (!file.exists(dest) || refresh) {
-    cli_inform(c("i" = "Downloading California Cap-and-Trade {type} data..."))
+    cli_inform(c("i" = "Downloading {.file {filename}}..."))
     co2_download(url, dest, refresh = refresh)
   } else {
     cli_inform(c("i" = "Loading {.file {filename}} from cache."))
   }
-
-  df <- utils::read.csv(dest, stringsAsFactors = FALSE, check.names = FALSE)
-
-  if (type == "price") {
-    out <- .california_tidy_price(df)
-    if (!is.null(from)) out <- out[out$date >= as.Date(from), , drop = FALSE]
-    if (!is.null(to))   out <- out[out$date <= as.Date(to), , drop = FALSE]
-    return(out)
+  ext <- tolower(tools::file_ext(filename))
+  df <- if (ext == "csv") {
+    utils::read.csv(dest, stringsAsFactors = FALSE, check.names = FALSE)
+  } else {
+    as.data.frame(readxl::read_excel(dest), stringsAsFactors = FALSE)
   }
   df
 }
 
-#' @noRd
-.ukets_tidy_price <- function(df) {
-  date_raw <- .euets_pick(df, c("^date$", "auction_date"))
+#' RGGI allowance distribution by state and year
+#'
+#' Fetches the Regional Greenhouse Gas Initiative (RGGI) annual CO2
+#' allowance distribution table from the public RGGI website. Covers
+#' 11 participating US states from 2009 onwards.
+#'
+#' Auction clearing prices are NOT returned here because RGGI
+#' publishes them only as per-auction PDFs (no CSV aggregation
+#' exists). For RGGI prices, use [co2_icap_prices()] with
+#' `jurisdiction = "Regional Greenhouse Gas Initiative"`.
+#'
+#' @param year Integer year (2009-present). Default is the current
+#'   year.
+#' @param refresh Re-download? Default `FALSE`.
+#' @return A data frame of allowance distribution by state.
+#' @family compliance markets
+#' @export
+#' @examples
+#' \dontrun{
+#' a <- co2_rggi_allowances(year = 2026)
+#' }
+co2_rggi_allowances <- function(year = NULL, refresh = FALSE) {
+  year <- year %||% as.integer(format(Sys.Date(), "%Y"))
+  year <- co2_validate_year(year, min_year = 2009L)
+  if (length(year) != 1L) {
+    cli_abort("{.arg year} must be a single integer for RGGI allowances.")
+  }
+
+  filename <- sprintf("%d_Allowance-Distribution.xlsx", year)
+  url <- sprintf("https://www.rggi.org/sites/default/files/Uploads/Allowance-Tracking/%s",
+                 filename)
+  dest <- file.path(co2_cache_dir(), paste0("rggi_", filename))
+  if (!file.exists(dest) || refresh) {
+    cli_inform(c("i" = "Downloading RGGI allowance distribution for {year}..."))
+    co2_download(url, dest, refresh = refresh)
+  } else {
+    cli_inform(c("i" = "Loading {.file {filename}} from cache."))
+  }
+  df <- readxl::read_excel(dest)
+  as.data.frame(df, stringsAsFactors = FALSE)
+}
+
+#' RGGI cumulative state proceeds by auction
+#'
+#' Fetches cumulative auction proceeds time series for one RGGI state,
+#' indexed by auction number. Derived from the per-state XLSX files on
+#' rggi.org. Combining all states gives the full RGGI auction time
+#' series.
+#'
+#' @param state Two-letter state code (one of: CT, DE, MA, MD, ME, NH,
+#'   NJ, NY, RI, VA, VT).
+#' @param refresh Re-download? Default `FALSE`.
+#' @return A data frame.
+#' @family compliance markets
+#' @export
+#' @examples
+#' \dontrun{
+#' ny <- co2_rggi_state_proceeds("NY")
+#' }
+co2_rggi_state_proceeds <- function(state, refresh = FALSE) {
+  valid_states <- c("CT", "DE", "MA", "MD", "ME", "NH",
+                    "NJ", "NY", "RI", "VA", "VT")
+  state <- toupper(state)
+  if (!state %in% valid_states) {
+    cli_abort(c(
+      "{.arg state} must be one of {.val {valid_states}}.",
+      "x" = "Got {.val {state}}."
+    ))
+  }
+  filename <- sprintf("%s_Proceeds_by_Auction.xlsx", state)
+  url <- sprintf("https://www.rggi.org/sites/default/files/Uploads/Auction-Materials/Cumulative-State-Charts/%s",
+                 filename)
+  dest <- file.path(co2_cache_dir(), paste0("rggi_", filename))
+  if (!file.exists(dest) || refresh) {
+    cli_inform(c("i" = "Downloading RGGI {state} cumulative proceeds..."))
+    co2_download(url, dest, refresh = refresh)
+  } else {
+    cli_inform(c("i" = "Loading {.file {filename}} from cache."))
+  }
+  df <- readxl::read_excel(dest)
+  out <- as.data.frame(df, stringsAsFactors = FALSE)
+  out$state <- state
+  out
+}
+
+#' California Cap-and-Trade auction settlement prices
+#'
+#' Fetches the California Air Resources Board auction settlement
+#' price time series, updated quarterly after each joint California-
+#' Quebec auction.
+#'
+#' @param refresh Re-download? Default `FALSE`.
+#' @return A data frame with `joint_auction`, `quarter`,
+#'   `settlement_price_usd`, `reserve_price_usd`.
+#' @family compliance markets
+#' @export
+#' @examples
+#' \dontrun{
+#' prices <- co2_california_prices()
+#' }
+co2_california_prices <- function(refresh = FALSE) {
+  url <- "https://ww2.arb.ca.gov/sites/default/files/2022-12/nc-allowance_prices.csv"
+  dest <- file.path(co2_cache_dir(), "california_allowance_prices.csv")
+  if (!file.exists(dest) || refresh) {
+    cli_inform(c("i" = "Downloading California Cap-and-Trade auction prices..."))
+    co2_download(url, dest, refresh = refresh)
+  } else {
+    cli_inform(c("i" = "Loading California prices from cache."))
+  }
+  df <- utils::read.csv(dest, stringsAsFactors = FALSE, check.names = FALSE)
   data.frame(
-    date = suppressWarnings(as.Date(date_raw)),
-    price_gbp = suppressWarnings(as.numeric(.euets_pick(df, c("price", "settlement_price", "clearing_price")))),
-    volume_t = suppressWarnings(as.numeric(.euets_pick(df, c("volume", "allocated_volume")))),
+    joint_auction = as.character(co2_pick(df, c("Joint Auction", "auction"))),
+    quarter_year = as.character(co2_pick(df, c("Quarter Year", "quarter"))),
+    settlement_price_usd = suppressWarnings(as.numeric(gsub("[$,]", "",
+      co2_pick(df, c("Current Auction Settlement Price", "settlement_price"))
+    ))),
+    reserve_price_usd = suppressWarnings(as.numeric(gsub("[$,]", "",
+      co2_pick(df, c("Auction Reserve Price", "reserve_price"))
+    ))),
     stringsAsFactors = FALSE
   )
 }
 
-#' @noRd
-.rggi_tidy_price <- function(df) {
-  date_raw <- .euets_pick(df, c("^date$", "auction_date"))
-  data.frame(
-    date = suppressWarnings(as.Date(date_raw)),
-    auction_number = as.character(.euets_pick(df, c("auction", "auction_number", "^number$"))),
-    price_usd = suppressWarnings(as.numeric(.euets_pick(df, c("clearing_price", "price", "settlement_price")))),
-    volume_t = suppressWarnings(as.numeric(.euets_pick(df, c("volume", "allowances_sold", "sold")))),
-    stringsAsFactors = FALSE
-  )
-}
-
-#' @noRd
-.california_tidy_price <- function(df) {
-  date_raw <- .euets_pick(df, c("^date$", "auction_date"))
-  data.frame(
-    date = suppressWarnings(as.Date(date_raw)),
-    auction_number = as.character(.euets_pick(df, c("auction", "auction_number"))),
-    price_usd = suppressWarnings(as.numeric(.euets_pick(df, c("settlement_price", "price", "clearing_price")))),
-    volume_t = suppressWarnings(as.numeric(.euets_pick(df, c("volume", "allowances_sold", "sold")))),
-    stringsAsFactors = FALSE
-  )
+#' California overall emissions caps
+#'
+#' Fetches the California Cap-and-Trade program overall cap and
+#' allocation channels, by vintage year.
+#'
+#' @param refresh Re-download? Default `FALSE`.
+#' @return A data frame.
+#' @family compliance markets
+#' @export
+#' @examples
+#' \dontrun{
+#' caps <- co2_california_caps()
+#' }
+co2_california_caps <- function(refresh = FALSE) {
+  url <- "https://ww2.arb.ca.gov/sites/default/files/2025-06/nc-OverallCaps.csv"
+  dest <- file.path(co2_cache_dir(), "california_overall_caps.csv")
+  if (!file.exists(dest) || refresh) {
+    cli_inform(c("i" = "Downloading California overall caps..."))
+    co2_download(url, dest, refresh = refresh)
+  } else {
+    cli_inform(c("i" = "Loading California caps from cache."))
+  }
+  df <- utils::read.csv(dest, stringsAsFactors = FALSE, check.names = FALSE)
+  df
 }

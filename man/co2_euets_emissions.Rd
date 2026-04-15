@@ -4,45 +4,50 @@
 \alias{co2_euets_emissions}
 \title{EU ETS verified emissions}
 \usage{
-co2_euets_emissions(country = NULL, year = NULL, refresh = FALSE)
+co2_euets_emissions(
+  country = NULL,
+  year = NULL,
+  file_year = NULL,
+  refresh = FALSE
+)
 }
 \arguments{
-\item{country}{Optional character vector of two-letter country
-codes to filter by (e.g. \code{c("DE", "FR", "PL")}).}
+\item{country}{Optional character vector of two-letter registry
+codes to filter (e.g. \code{c("DE", "FR", "PL")}).}
 
-\item{year}{Optional integer vector of years to filter by.}
+\item{year}{Optional integer vector of emissions years. When
+\code{NULL}, returns all years in the latest published file. Note
+that the file year (e.g. "2025") refers to publication year;
+emissions data covers calendar years up to publication year -1.}
 
-\item{refresh}{Logical. Re-download the underlying bulk file even
-if cached? Default \code{FALSE}.}
+\item{file_year}{Publication year of the DG CLIMA file to use.
+Default is the latest year available in the package (see
+\code{\link[=co2_euets_files]{co2_euets_files()}}).}
+
+\item{refresh}{Logical. Re-download? Default \code{FALSE}.}
 }
 \value{
-A data frame with columns \code{country}, \code{year}, \code{installation_id},
-\code{installation_name}, \code{activity}, \code{verified_emissions_tco2e},
-plus metadata fields.
+A data frame with columns \code{country}, \code{installation_id},
+\code{installation_name}, \code{activity}, \code{year},
+\code{verified_emissions_tco2e}, \code{allocation_eua}.
 }
 \description{
-Fetches verified greenhouse-gas emissions from installations
-covered by the EU Emissions Trading System, as compiled by the
-European Environment Agency from the EU Transaction Log (EUTL).
-}
-\details{
-Coverage: ~10,000 stationary installations plus ~1,500 aircraft
-operators across the EU, EEA (Norway, Iceland, Liechtenstein), and
-until 2020 the UK. Annual data from 2005. Emissions are verified
-against annual compliance cycles and published each spring for
-the prior year.
+Fetches annual verified greenhouse-gas emissions for installations
+covered by the EU Emissions Trading System, from the DG CLIMA
+Union Registry bulk download. Coverage: ~10,000 stationary
+installations plus ~1,500 aircraft operators across the EU, EEA,
+and linked Swiss ETS. Emissions data from 2005 onwards; annual
+files published each April for the prior compliance year.
 }
 \examples{
 \dontrun{
-op <- options(carbondata.cache_dir = tempdir())
-de <- co2_euets_emissions(country = "DE", year = 2022)
-head(de)
-options(op)
+de <- co2_euets_emissions(country = "DE")
 }
 }
 \seealso{
 Other EU ETS: 
 \code{\link{co2_euets_allocations}()},
+\code{\link{co2_euets_files}()},
 \code{\link{co2_euets_installations}()},
 \code{\link{co2_euets_price}()},
 \code{\link{co2_euets_surrendered}()}

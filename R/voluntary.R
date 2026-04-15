@@ -1,200 +1,158 @@
-# Voluntary carbon market data: Berkeley VROD, CarbonPlan OffsetsDB,
-# CAD Trust. These aggregate data from Verra, Gold Standard, ACR,
-# CAR, and other registries.
-
-.offsets_db_base <- "https://offsets-db-api.carbonplan.org/api/v1"
-.cad_trust_base <- "https://api.climateactiondata.org/v1"
+# Voluntary carbon market aggregators: Berkeley VROD, CarbonPlan
+# OffsetsDB (via S3 parquet; REST API dead as of 2026-04).
+#
+# Climate Action Data Trust (CAD Trust) requires either self-hosting
+# or a private partnership for API access, so not supported in v0.1.0.
 
 #' Berkeley Voluntary Registry Offsets Database
 #'
-#' Fetches the Berkeley Voluntary Registry Offsets Database, a
-#' project-level aggregator covering Verra (VCS), Gold Standard,
-#' American Carbon Registry (ACR), Climate Action Reserve (CAR), and
-#' ART TREES. Data is released quarterly under CC BY 4.0.
+#' Fetches the Berkeley GSPP Voluntary Registry Offsets Database, an
+#' aggregator of Verra, Gold Standard, ACR, CAR, and ART TREES
+#' project registrations and issuances. Released bimonthly under
+#' CC BY 4.0.
 #'
-#' @param registry Optional character. Filter by one or more
-#'   registries: `"Verra"`, `"Gold Standard"`, `"ACR"`, `"CAR"`,
-#'   `"ART TREES"`.
-#' @param project_type Optional character. Filter by project type
-#'   (e.g. `"Forestry"`, `"Renewable Energy"`, `"Household Devices"`).
-#' @param country Optional character vector of country names.
-#' @param refresh Re-download? Default `FALSE`.
-#'
-#' @return A data frame with project-level fields: `project_id`,
-#'   `registry`, `project_name`, `country`, `project_type`,
-#'   `methodology`, `total_issuances`, `total_retirements`, plus
-#'   metadata.
-#'
+#' @param refresh Re-download? Default `FALSE`. Each release has a
+#'   date-stamped filename; the package scrapes the landing page to
+#'   find the latest release on each call unless a cached copy exists.
+#' @return A data frame of project-level data.
 #' @family voluntary markets
 #' @export
 #' @examples
 #' \dontrun{
-#' op <- options(carbondata.cache_dir = tempdir())
-#' vrod <- co2_vrod(registry = "Verra", project_type = "Forestry")
-#' options(op)
+#' vrod <- co2_vrod()
 #' }
-co2_vrod <- function(registry = NULL, project_type = NULL,
-                     country = NULL, refresh = FALSE) {
-  # Berkeley VROD is published as an Excel file with a version suffix
-  # that updates quarterly. We use the "latest" alias URL where
-  # available, and fall back to scraping the landing page.
-  url <- "https://gspp.berkeley.edu/assets/uploads/research/xlsx/GSPP_VRO_database_latest.xlsx"
-  dest <- file.path(co2_cache_dir(), "vrod.xlsx")
+co2_vrod <- function(refresh = FALSE) {
+  page_url <- "https://gspp.berkeley.edu/berkeley-carbon-trading-project/offsets-database"
+  cli_inform(c("i" = "Resolving latest VROD release..."))
+  hits <- co2_scrape_links(
+    page_url,
+    "Voluntary-Registry-Offsets-Database--v[0-9-]+(-year-end)?\\.xlsx$"
+  )
+  if (length(hits) == 0L) {
+    cli_abort(c(
+      "No VROD file found on {.url {page_url}}.",
+      "i" = "Berkeley may have restructured the landing page."
+    ))
+  }
+  url <- hits[1L]
+  filename <- basename(url)
+  dest <- file.path(co2_cache_dir(), paste0("vrod_", filename))
   if (!file.exists(dest) || refresh) {
-    cli_inform(c("i" = "Downloading Berkeley Voluntary Registry Offsets Database..."))
+    cli_inform(c("i" = "Downloading {.file {filename}} (~16 MB)..."))
     co2_download(url, dest, refresh = refresh)
   } else {
-    cli_inform(c("i" = "Loading VROD from cache."))
+    cli_inform(c("i" = "Loading {.file {filename}} from cache."))
   }
-
-  df <- tryCatch(
-    readxl::read_excel(dest, sheet = 1),
-    error = function(e) {
-      cli_abort(c(
-        "Failed to read VROD Excel file.",
-        "x" = conditionMessage(e),
-        "i" = "Try {.code co2_vrod(refresh = TRUE)} to re-download."
-      ))
-    }
-  )
-  df <- as.data.frame(df, stringsAsFactors = FALSE)
-  out <- .vrod_tidy(df)
-
-  if (!is.null(registry)) {
-    out <- out[out$registry %in% registry, , drop = FALSE]
-  }
-  if (!is.null(project_type)) {
-    out <- out[out$project_type %in% project_type, , drop = FALSE]
-  }
-  if (!is.null(country)) {
-    out <- out[out$country %in% country, , drop = FALSE]
-  }
-  rownames(out) <- NULL
-  out
+  df <- readxl::read_excel(dest, sheet = 1L)
+  as.data.frame(df, stringsAsFactors = FALSE)
 }
 
-#' CarbonPlan OffsetsDB
+#' CarbonPlan OffsetsDB (via S3 parquet)
 #'
-#' Queries the CarbonPlan OffsetsDB REST API for voluntary carbon
-#' market data. OffsetsDB aggregates project and credit data from
-#' Verra, Gold Standard, ACR, CAR, ART, and Plan Vivo, with daily
-#' updates.
+#' Fetches the CarbonPlan OffsetsDB daily snapshots of voluntary
+#' carbon market projects and credits, stored as Parquet in a public
+#' S3 bucket. Covers Verra, ART TREES, Gold Standard, American
+#' Carbon Registry, and Climate Action Reserve.
 #'
-#' @param endpoint Character. One of `"projects"`, `"credits"`, or
-#'   `"retirements"`. Default `"projects"`.
-#' @param filters Named list of query parameters to pass through to
-#'   the API. See the OffsetsDB API docs.
-#' @param limit Integer. Max records to fetch. Default `1000`.
+#' The CarbonPlan REST API at `offsets-db-api.carbonplan.org` was
+#' deprecated; this function uses the S3 bucket directly. Parquet
+#' reading requires an installed Parquet reader; the `arrow`
+#' package is the recommended suggest.
 #'
-#' @return A data frame of results.
-#'
-#' @family voluntary markets
-#' @export
-#' @examples
-#' \dontrun{
-#' offsets <- co2_offsets_db("projects", filters = list(registry = "Verra"))
-#' }
-co2_offsets_db <- function(endpoint = c("projects", "credits", "retirements"),
-                           filters = list(), limit = 1000L) {
-  endpoint <- match.arg(endpoint)
-  if (!is.numeric(limit) || limit < 1L) {
-    cli_abort("{.arg limit} must be a positive integer.")
-  }
-
-  url <- paste0(.offsets_db_base, "/", endpoint, "/")
-  params <- c(filters, list(per_page = as.integer(limit)))
-
-  req <- co2_request(url)
-  req <- httr2::req_headers(req, Accept = "application/json")
-  if (length(params) > 0L) {
-    req <- httr2::req_url_query(req, !!!params)
-  }
-  resp <- tryCatch(
-    httr2::req_perform(req),
-    error = function(e) {
-      cli_abort(c(
-        "Failed to query OffsetsDB API.",
-        "x" = conditionMessage(e)
-      ))
-    }
-  )
-  if (httr2::resp_status(resp) >= 400L) {
-    cli_abort("OffsetsDB API returned HTTP {httr2::resp_status(resp)}.")
-  }
-
-  body <- httr2::resp_body_json(resp)
-  items <- body$data %||% body$results %||% body
-  if (!is.list(items) || length(items) == 0L) return(data.frame())
-  co2_list_to_df(items)
-}
-
-#' Climate Action Data Trust (CAD Trust)
-#'
-#' Queries the Climate Action Data Trust API for metadata on
-#' Article 6-aligned carbon credits. CAD Trust is a harmonised
-#' registry-of-registries launched by the World Bank, IETA, and
-#' partners. Public API access launched October 2025.
-#'
-#' @param project_id Optional character. Specific CAD Trust project ID.
+#' @param kind Character. `"projects"` (default) or `"credits"`.
+#' @param date Optional character. ISO date of the snapshot to fetch
+#'   (must be a day CarbonPlan published; the function walks backwards
+#'   from this date up to 7 days). Default `Sys.Date()`.
 #' @param refresh Re-download? Default `FALSE`.
 #'
-#' @return A data frame.
+#' @return A file path to the downloaded Parquet file. The caller
+#'   must have `arrow` or `nanoparquet` installed to read it.
 #'
 #' @family voluntary markets
 #' @export
 #' @examples
 #' \dontrun{
-#' cad <- co2_cad_trust()
+#' path <- co2_offsets_db("projects")
+#' df <- arrow::read_parquet(path)
 #' }
-co2_cad_trust <- function(project_id = NULL, refresh = FALSE) {
-  url <- if (is.null(project_id)) {
-    paste0(.cad_trust_base, "/projects")
-  } else {
-    paste0(.cad_trust_base, "/projects/",
-           utils::URLencode(project_id, reserved = TRUE))
-  }
+co2_offsets_db <- function(kind = c("projects", "credits"),
+                           date = NULL, refresh = FALSE) {
+  kind <- match.arg(kind)
+  date <- date %||% format(Sys.Date(), "%Y-%m-%d")
+  date <- co2_validate_date(date, "date")
 
-  req <- co2_request(url)
-  req <- httr2::req_headers(req, Accept = "application/json")
-
-  resp <- tryCatch(
-    httr2::req_perform(req),
-    error = function(e) {
-      cli_abort(c(
-        "Failed to query CAD Trust API.",
-        "x" = conditionMessage(e),
-        "i" = "CAD Trust API requires registration at https://climateactiondata.org/."
-      ))
+  # Walk back up to 7 days to find an available snapshot
+  found_url <- NULL
+  found_date <- NULL
+  for (offset in 0:7) {
+    try_date <- format(as.Date(date) - offset, "%Y-%m-%d")
+    candidate <- sprintf(
+      "https://carbonplan-offsets-db.s3.amazonaws.com/final/%s/%s-augmented.parquet",
+      try_date, kind
+    )
+    req <- co2_request(candidate)
+    req <- httr2::req_method(req, "HEAD")
+    resp <- tryCatch(httr2::req_perform(req), error = function(e) NULL)
+    if (!is.null(resp) && httr2::resp_status(resp) == 200L) {
+      found_url <- candidate
+      found_date <- try_date
+      break
     }
-  )
-  if (httr2::resp_status(resp) >= 400L) {
-    cli_abort("CAD Trust API returned HTTP {httr2::resp_status(resp)}.")
+  }
+  if (is.null(found_url)) {
+    cli_abort(c(
+      "No CarbonPlan OffsetsDB snapshot found within 7 days of {date}.",
+      "i" = "Try a different {.arg date} or check the bucket status."
+    ))
   }
 
-  body <- httr2::resp_body_json(resp)
-  items <- body$data %||% body$results %||% list(body)
-  if (!is.list(items) || length(items) == 0L) return(data.frame())
-  co2_list_to_df(items)
+  filename <- sprintf("offsetsdb_%s_%s-augmented.parquet", found_date, kind)
+  dest <- file.path(co2_cache_dir(), filename)
+  if (!file.exists(dest) || refresh) {
+    cli_inform(c("i" = "Downloading OffsetsDB {kind} snapshot from {found_date}..."))
+    co2_download(found_url, dest, refresh = refresh)
+  } else {
+    cli_inform(c("i" = "Loading {.file {filename}} from cache."))
+  }
+  if (!requireNamespace("arrow", quietly = TRUE) &&
+      !requireNamespace("nanoparquet", quietly = TRUE)) {
+    cli_warn(c(
+      "!" = "Install the {.pkg arrow} or {.pkg nanoparquet} package to read the returned Parquet file.",
+      "i" = "Returning file path only."
+    ))
+  }
+  dest
 }
 
-#' @noRd
-.vrod_tidy <- function(df) {
-  data.frame(
-    project_id = as.character(.euets_pick(df, c("project_id", "id"))),
-    registry = as.character(.euets_pick(df, c("registry", "standard"))),
-    project_name = as.character(.euets_pick(df, c("project_name", "name", "project$"))),
-    country = as.character(.euets_pick(df, c("country", "location"))),
-    project_type = as.character(.euets_pick(df, c("project_type", "type", "scope", "category"))),
-    methodology = as.character(.euets_pick(df, c("methodology", "protocol"))),
-    total_issuances = suppressWarnings(as.numeric(
-      .euets_pick(df, c("total_issuances", "total_credits_issued", "issuances"))
-    )),
-    total_retirements = suppressWarnings(as.numeric(
-      .euets_pick(df, c("total_retirements", "total_credits_retired", "retirements"))
-    )),
-    first_issuance_date = suppressWarnings(as.Date(
-      .euets_pick(df, c("first_issuance", "first_issued"))
-    )),
-    stringsAsFactors = FALSE
-  )
+#' Climate Action Data Trust (not supported in v0.1.0)
+#'
+#' CAD Trust is the Chia-Network "cadt" software designed to be
+#' self-hosted. There is no unauthenticated public API. To use CAD
+#' Trust data you must either:
+#' \itemize{
+#'   \item Self-host a cadt node, or
+#'   \item Arrange a private partnership for API access via
+#'     <https://climateactiondata.org/how-to-connect/>
+#' }
+#'
+#' This function is a placeholder that errors with guidance. CAD Trust
+#' support is deferred to carbondata v0.2.0 once CAD Trust offers a
+#' stable public endpoint.
+#'
+#' @param ... Ignored.
+#' @return Never returns (always errors).
+#' @family voluntary markets
+#' @export
+#' @examples
+#' \dontrun{
+#' co2_cad_trust()
+#' }
+co2_cad_trust <- function(...) {
+  cli_abort(c(
+    "CAD Trust is not supported in carbondata v0.1.0.",
+    "i" = "CAD Trust has no unauthenticated public API.",
+    "i" = "Self-host a cadt node from https://github.com/Chia-Network/cadt, or",
+    " " = "request partnership access at https://climateactiondata.org/how-to-connect/",
+    " " = "Follow https://github.com/charlescoverdale/carbondata for v0.2.0 support."
+  ))
 }

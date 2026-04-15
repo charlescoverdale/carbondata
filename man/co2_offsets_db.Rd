@@ -2,35 +2,39 @@
 % Please edit documentation in R/voluntary.R
 \name{co2_offsets_db}
 \alias{co2_offsets_db}
-\title{CarbonPlan OffsetsDB}
+\title{CarbonPlan OffsetsDB (via S3 parquet)}
 \usage{
-co2_offsets_db(
-  endpoint = c("projects", "credits", "retirements"),
-  filters = list(),
-  limit = 1000L
-)
+co2_offsets_db(kind = c("projects", "credits"), date = NULL, refresh = FALSE)
 }
 \arguments{
-\item{endpoint}{Character. One of \code{"projects"}, \code{"credits"}, or
-\code{"retirements"}. Default \code{"projects"}.}
+\item{kind}{Character. \code{"projects"} (default) or \code{"credits"}.}
 
-\item{filters}{Named list of query parameters to pass through to
-the API. See the OffsetsDB API docs.}
+\item{date}{Optional character. ISO date of the snapshot to fetch
+(must be a day CarbonPlan published; the function walks backwards
+from this date up to 7 days). Default \code{Sys.Date()}.}
 
-\item{limit}{Integer. Max records to fetch. Default \code{1000}.}
+\item{refresh}{Re-download? Default \code{FALSE}.}
 }
 \value{
-A data frame of results.
+A file path to the downloaded Parquet file. The caller
+must have \code{arrow} or \code{nanoparquet} installed to read it.
 }
 \description{
-Queries the CarbonPlan OffsetsDB REST API for voluntary carbon
-market data. OffsetsDB aggregates project and credit data from
-Verra, Gold Standard, ACR, CAR, ART, and Plan Vivo, with daily
-updates.
+Fetches the CarbonPlan OffsetsDB daily snapshots of voluntary
+carbon market projects and credits, stored as Parquet in a public
+S3 bucket. Covers Verra, ART TREES, Gold Standard, American
+Carbon Registry, and Climate Action Reserve.
+}
+\details{
+The CarbonPlan REST API at \code{offsets-db-api.carbonplan.org} was
+deprecated; this function uses the S3 bucket directly. Parquet
+reading requires an installed Parquet reader; the \code{arrow}
+package is the recommended suggest.
 }
 \examples{
 \dontrun{
-offsets <- co2_offsets_db("projects", filters = list(registry = "Verra"))
+path <- co2_offsets_db("projects")
+df <- arrow::read_parquet(path)
 }
 }
 \seealso{

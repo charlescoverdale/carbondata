@@ -2,37 +2,41 @@
 % Please edit documentation in R/euets.R
 \name{co2_euets_surrendered}
 \alias{co2_euets_surrendered}
-\title{EU ETS surrendered units}
+\title{EU ETS compliance status and cumulative surrendered units}
 \usage{
-co2_euets_surrendered(country = NULL, year = NULL, refresh = FALSE)
+co2_euets_surrendered(country = NULL, file_year = NULL, refresh = FALSE)
 }
 \arguments{
-\item{country}{Optional two-letter country codes.}
+\item{country}{Optional two-letter registry codes.}
 
-\item{year}{Optional integer years.}
+\item{file_year}{Publication year of the compliance file. Default
+is the latest in the package.}
 
 \item{refresh}{Re-download? Default \code{FALSE}.}
 }
 \value{
-A data frame with \code{country}, \code{year}, \code{installation_id},
-\code{surrendered_units}, \code{unit_type}.
+A data frame with \code{country}, \code{installation_id},
+\code{installation_name}, \code{compliance_code}, \code{compliance_status},
+\code{total_verified_emissions}, \code{total_surrendered_allowances},
+\code{year_of_first_emissions}, \code{year_of_last_emissions},
+\code{account_closure}.
 }
 \description{
-Fetches the allowances surrendered by installations to cover their
-verified emissions. Compliance requires surrendering allowances
-equal to verified emissions by 30 April each year.
+Returns cumulative total surrendered allowances per installation,
+compliance code, and account closure date. Per-year surrender events
+require the EUTL transaction log ZIP, which is deferred to v0.2.0
+because it is ~1.5 GB uncompressed and requires LZMA extraction.
 }
 \examples{
 \dontrun{
-op <- options(carbondata.cache_dir = tempdir())
-s <- co2_euets_surrendered(country = "FR", year = 2022)
-options(op)
+comp <- co2_euets_surrendered(country = "FR")
 }
 }
 \seealso{
 Other EU ETS: 
 \code{\link{co2_euets_allocations}()},
 \code{\link{co2_euets_emissions}()},
+\code{\link{co2_euets_files}()},
 \code{\link{co2_euets_installations}()},
 \code{\link{co2_euets_price}()}
 }

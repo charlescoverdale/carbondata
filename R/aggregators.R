@@ -2,36 +2,29 @@
 
 #' ICAP Allowance Price Explorer
 #'
-#' Fetches allowance prices across the world's Emissions Trading
-#' Systems from the International Carbon Action Partnership (ICAP)
-#' Allowance Price Explorer. Covers 20+ jurisdictions including the
-#' EU, UK, California, RGGI, New Zealand, Korea, China, and others.
-#' Data is curated quarterly by ICAP.
+#' Fetches allowance prices across 20+ Emissions Trading Systems from
+#' the International Carbon Action Partnership (ICAP) Allowance Price
+#' Explorer. Covers EU ETS, UK ETS, California, RGGI, New Zealand,
+#' Korea, and other jurisdictions with auction and secondary-market
+#' prices where available.
 #'
-#' @param jurisdiction Optional character vector of jurisdictions
-#'   (e.g. `c("EU ETS", "UK ETS", "RGGI")`). See
-#'   <https://icapcarbonaction.com/en/ets-prices> for the full list.
-#' @param from,to Optional. Date range (YYYY-MM-DD).
+#' @param jurisdiction Optional character vector. Filter by
+#'   jurisdiction name (e.g. `c("Regional Greenhouse Gas Initiative",
+#'   "EU ETS")`). When `NULL`, returns all.
 #' @param refresh Re-download? Default `FALSE`.
 #'
-#' @return A data frame with `date`, `jurisdiction`, `price_usd`,
-#'   `currency_native`, `price_native`.
+#' @return A data frame with `date`, `jurisdiction`, `market_type`
+#'   (`"primary"` auction or `"secondary"`), `price`, and `currency`.
 #'
 #' @family aggregators
 #' @export
 #' @examples
 #' \dontrun{
-#' op <- options(carbondata.cache_dir = tempdir())
-#' prices <- co2_icap_prices(jurisdiction = c("EU ETS", "UK ETS"))
-#' options(op)
+#' prices <- co2_icap_prices(jurisdiction = "EU ETS")
 #' }
-co2_icap_prices <- function(jurisdiction = NULL, from = NULL, to = NULL,
-                            refresh = FALSE) {
-  from <- co2_validate_date(from, "from")
-  to   <- co2_validate_date(to, "to")
-
-  url <- "https://icapcarbonaction.com/system/files/ape_download/ape_prices.csv"
-  dest <- file.path(co2_cache_dir(), "icap_prices.csv")
+co2_icap_prices <- function(jurisdiction = NULL, refresh = FALSE) {
+  url <- "https://allowancepriceexplorer.icapcarbonaction.com/api/systems"
+  dest <- file.path(co2_cache_dir(), "icap_prices.json")
   if (!file.exists(dest) || refresh) {
     cli_inform(c("i" = "Downloading ICAP Allowance Price Explorer data..."))
     co2_download(url, dest, refresh = refresh)
@@ -39,80 +32,98 @@ co2_icap_prices <- function(jurisdiction = NULL, from = NULL, to = NULL,
     cli_inform(c("i" = "Loading ICAP data from cache."))
   }
 
-  df <- utils::read.csv(dest, stringsAsFactors = FALSE, check.names = FALSE)
-  out <- .icap_tidy(df)
-  if (!is.null(jurisdiction)) {
+  body <- jsonlite::fromJSON(dest, simplifyVector = FALSE)
+  if (length(body) == 0L) return(data.frame())
+
+  rows <- list()
+  for (sys in body) {
+    name <- sys$name %||% NA_character_
+    curr <- if (!is.null(sys$currency)) sys$currency[[1L]] else "USD"
+    for (mt in c("primary", "secondary")) {
+      vals <- sys$values[[mt]]
+      if (is.null(vals)) next
+      for (d in names(vals)) {
+        v <- vals[[d]]
+        if (is.null(v) || length(v) == 0L) next
+        price <- as.numeric(v[[1L]])
+        if (is.na(price)) next
+        rows[[length(rows) + 1L]] <- data.frame(
+          date = as.Date(d),
+          jurisdiction = name,
+          market_type = mt,
+          price = price,
+          currency = curr,
+          stringsAsFactors = FALSE
+        )
+      }
+    }
+  }
+  out <- if (length(rows) == 0L) data.frame() else do.call(rbind, rows)
+
+  if (!is.null(jurisdiction) && nrow(out) > 0L) {
     out <- out[out$jurisdiction %in% jurisdiction, , drop = FALSE]
   }
-  if (!is.null(from)) out <- out[out$date >= as.Date(from), , drop = FALSE]
-  if (!is.null(to))   out <- out[out$date <= as.Date(to), , drop = FALSE]
   rownames(out) <- NULL
   out
 }
 
 #' World Bank Carbon Pricing Dashboard
 #'
-#' Fetches global carbon pricing data (carbon taxes and ETS) from the
-#' World Bank Carbon Pricing Dashboard. Covers instruments, prices,
-#' emissions coverage, and revenue for over 70 carbon pricing
-#' initiatives worldwide.
+#' Fetches the World Bank Carbon Pricing Dashboard Excel file, which
+#' covers 70+ carbon pricing initiatives worldwide (carbon taxes +
+#' ETS) with price, coverage, and revenue data.
 #'
-#' @param year Optional integer year to filter by.
-#' @param instrument Optional character: `"ets"`, `"tax"`, or NULL
-#'   for both.
+#' The World Bank publishes a dated file every 6-12 months. This
+#' function scrapes the landing page to find the latest release.
+#'
 #' @param refresh Re-download? Default `FALSE`.
-#'
-#' @return A data frame with columns `year`, `jurisdiction`,
-#'   `instrument_type`, `name`, `price_usd_per_tco2e`,
-#'   `emissions_covered_pct`, `revenue_usd_millions`.
-#'
+#' @return A data frame.
 #' @family aggregators
 #' @export
 #' @examples
 #' \dontrun{
-#' op <- options(carbondata.cache_dir = tempdir())
-#' wb <- co2_world_bank(year = 2024)
-#' options(op)
+#' wb <- co2_world_bank()
 #' }
-co2_world_bank <- function(year = NULL, instrument = NULL,
-                           refresh = FALSE) {
-  year <- co2_validate_year(year, min_year = 1990L)
-  if (!is.null(instrument)) {
-    instrument <- match.arg(instrument, c("ets", "tax"))
+co2_world_bank <- function(refresh = FALSE) {
+  page_url <- "https://carbonpricingdashboard.worldbank.org/about"
+  cli_inform(c("i" = "Resolving latest World Bank Carbon Pricing file..."))
+  hits <- co2_scrape_links(
+    page_url,
+    "carbon-pricing-dashboard-data/data_\\d{2}_\\d{4}\\.xlsx$"
+  )
+  if (length(hits) == 0L) {
+    cli_abort(c(
+      "No World Bank Carbon Pricing file found on {.url {page_url}}.",
+      "i" = "The dashboard may have restructured its downloads page."
+    ))
   }
-
-  url <- "https://carbonpricingdashboard.worldbank.org/api/carbon_pricing_dashboard.csv"
-  dest <- file.path(co2_cache_dir(), "world_bank_carbon_pricing.csv")
+  url <- hits[1L]
+  filename <- basename(url)
+  dest <- file.path(co2_cache_dir(), paste0("wb_", filename))
   if (!file.exists(dest) || refresh) {
-    cli_inform(c("i" = "Downloading World Bank Carbon Pricing Dashboard..."))
+    cli_inform(c("i" = "Downloading {.file {filename}}..."))
     co2_download(url, dest, refresh = refresh)
   } else {
-    cli_inform(c("i" = "Loading World Bank data from cache."))
+    cli_inform(c("i" = "Loading {.file {filename}} from cache."))
   }
-
-  df <- utils::read.csv(dest, stringsAsFactors = FALSE, check.names = FALSE)
-  out <- .world_bank_tidy(df)
-  if (!is.null(year)) out <- out[out$year %in% year, , drop = FALSE]
-  if (!is.null(instrument)) {
-    out <- out[tolower(out$instrument_type) == instrument, , drop = FALSE]
-  }
-  rownames(out) <- NULL
-  out
+  df <- readxl::read_excel(dest)
+  as.data.frame(df, stringsAsFactors = FALSE)
 }
 
 #' RFF World Carbon Pricing Database
 #'
-#' Fetches the Resources for the Future (RFF) World Carbon Pricing
-#' Database compiled by Dolphin, Pollitt and Newbery (2020). Provides
-#' harmonised subnational and national carbon pricing from 1990 to
-#' 2020 across 200+ jurisdictions. Published in Nature Scientific
-#' Data.
+#' Fetches the Dolphin-Pollitt-Newbery World Carbon Pricing Database
+#' for one country. Covers national-level carbon pricing from 1989
+#' to present, with CO2 tax and ETS instruments harmonised across
+#' 200+ jurisdictions.
 #'
-#' @param country Optional ISO 3-letter country codes.
-#' @param year Optional integer years.
+#' @param country Character. Country name using underscores
+#'   (e.g. `"United_Kingdom"`, `"Germany"`, `"Antigua_and_Barbuda"`).
+#' @param version Character. Dataset version folder. Default
+#'   `"v2026.1"`.
 #' @param refresh Re-download? Default `FALSE`.
 #'
-#' @return A data frame.
+#' @return A data frame of annual carbon prices by IPCC sector code.
 #'
 #' @references
 #' Dolphin, G. G., Pollitt, M. G. and Newbery, D. M. (2020).
@@ -124,68 +135,25 @@ co2_world_bank <- function(year = NULL, instrument = NULL,
 #' @export
 #' @examples
 #' \dontrun{
-#' op <- options(carbondata.cache_dir = tempdir())
-#' rff <- co2_rff_pricing(country = "GBR")
-#' options(op)
+#' uk <- co2_rff_pricing("United_Kingdom")
 #' }
-co2_rff_pricing <- function(country = NULL, year = NULL,
-                            refresh = FALSE) {
-  year <- co2_validate_year(year, min_year = 1990L)
-
-  url <- "https://github.com/g-dolphin/WorldCarbonPricingDatabase/raw/master/_dataset/data/CO2/national/CO2_national_emissions.csv"
-  dest <- file.path(co2_cache_dir(), "rff_carbon_pricing.csv")
+co2_rff_pricing <- function(country, version = "v2026.1", refresh = FALSE) {
+  if (missing(country) || !is.character(country) || length(country) != 1L) {
+    cli_abort("{.arg country} must be a single country name with underscores.")
+  }
+  filename <- sprintf("wcpd_co2_%s.csv", country)
+  url <- sprintf(
+    "https://raw.githubusercontent.com/g-dolphin/WorldCarbonPricingDatabase/main/_dataset/data/%s/CO2/national/%s",
+    version, filename
+  )
+  dest <- file.path(co2_cache_dir(), paste0("rff_", filename))
   if (!file.exists(dest) || refresh) {
-    cli_inform(c("i" = "Downloading RFF World Carbon Pricing Database..."))
+    cli_inform(c("i" = "Downloading RFF World Carbon Pricing Database for {country}..."))
     co2_download(url, dest, refresh = refresh)
   } else {
-    cli_inform(c("i" = "Loading RFF data from cache."))
+    cli_inform(c("i" = "Loading {.file {filename}} from cache."))
   }
-
-  df <- utils::read.csv(dest, stringsAsFactors = FALSE, check.names = FALSE)
-  out <- .rff_tidy(df)
-  if (!is.null(country)) {
-    out <- out[toupper(out$country) %in% toupper(country), , drop = FALSE]
-  }
-  if (!is.null(year)) out <- out[out$year %in% year, , drop = FALSE]
-  rownames(out) <- NULL
-  out
-}
-
-#' @noRd
-.icap_tidy <- function(df) {
-  date_raw <- .euets_pick(df, c("^date$", "period"))
-  data.frame(
-    date = suppressWarnings(as.Date(date_raw)),
-    jurisdiction = as.character(.euets_pick(df, c("jurisdiction", "^ets$", "scheme"))),
-    price_usd = suppressWarnings(as.numeric(.euets_pick(df, c("price_usd", "usd")))),
-    currency_native = as.character(.euets_pick(df, c("currency", "native_currency"), default = "USD")),
-    price_native = suppressWarnings(as.numeric(.euets_pick(df, c("price_native", "^price$")))),
-    stringsAsFactors = FALSE
-  )
-}
-
-#' @noRd
-.world_bank_tidy <- function(df) {
-  data.frame(
-    year = suppressWarnings(as.integer(.euets_pick(df, c("^year$")))),
-    jurisdiction = as.character(.euets_pick(df, c("jurisdiction", "country", "region"))),
-    instrument_type = as.character(.euets_pick(df, c("instrument", "^type$"))),
-    name = as.character(.euets_pick(df, c("instrument_name", "^name$"))),
-    price_usd_per_tco2e = suppressWarnings(as.numeric(.euets_pick(df, c("price_usd", "price")))),
-    emissions_covered_pct = suppressWarnings(as.numeric(.euets_pick(df, c("coverage", "emissions_covered")))),
-    revenue_usd_millions = suppressWarnings(as.numeric(.euets_pick(df, c("revenue", "revenue_usd")))),
-    stringsAsFactors = FALSE
-  )
-}
-
-#' @noRd
-.rff_tidy <- function(df) {
-  data.frame(
-    country = as.character(.euets_pick(df, c("jurisdiction", "country", "iso", "^code$"))),
-    year = suppressWarnings(as.integer(.euets_pick(df, c("^year$")))),
-    sector = as.character(.euets_pick(df, c("sector", "industry"))),
-    instrument_type = as.character(.euets_pick(df, c("instrument", "^type$"))),
-    price_usd_per_tco2e = suppressWarnings(as.numeric(.euets_pick(df, c("price", "price_usd")))),
-    stringsAsFactors = FALSE
-  )
+  df <- utils::read.csv(dest, stringsAsFactors = FALSE, check.names = FALSE,
+                        na.strings = c("", "NA"))
+  df
 }

@@ -29,7 +29,7 @@ co2_markets_data <- data.frame(
   market = c(
     "eu_ets", "uk_ets", "rggi", "california",
     "icap", "world_bank", "rff",
-    "vrod", "offsets_db", "cad_trust"
+    "vrod", "offsets_db"
   ),
   name = c(
     "EU Emissions Trading System",
@@ -40,36 +40,33 @@ co2_markets_data <- data.frame(
     "World Bank Carbon Pricing Dashboard",
     "RFF World Carbon Pricing Database",
     "Berkeley Voluntary Registry Offsets Database",
-    "CarbonPlan OffsetsDB",
-    "Climate Action Data Trust"
+    "CarbonPlan OffsetsDB"
   ),
   type = c(
     "compliance", "compliance", "compliance", "compliance",
     "compliance", "compliance", "compliance",
-    "voluntary", "voluntary", "voluntary"
+    "voluntary", "voluntary"
   ),
   coverage_start = c(
     2005L, 2021L, 2009L, 2013L,
-    2005L, 1990L, 1990L,
-    1996L, 1996L, 2022L
+    2005L, 1990L, 1989L,
+    1996L, 1996L
   ),
   jurisdiction = c(
     "EU + EEA", "United Kingdom", "US Northeast (11 states)", "California",
-    "Global (multi-ETS)", "Global (carbon taxes + ETS)", "Global (subnational)",
-    "Global (5 voluntary registries)", "Global (voluntary)",
-    "Global (Article 6, blockchain)"
+    "Global (multi-ETS)", "Global (carbon taxes + ETS)", "National (200+ countries)",
+    "Global (5 voluntary registries)", "Global (voluntary)"
   ),
   function_name = c(
-    "co2_euets_emissions, co2_euets_allocations, co2_euets_surrendered, co2_euets_price, co2_euets_installations",
-    "co2_ukets",
-    "co2_rggi",
-    "co2_california",
+    "co2_euets_emissions, co2_euets_allocations, co2_euets_surrendered, co2_euets_price, co2_euets_installations, co2_euets_files",
+    "co2_ukets, co2_ukets_allocations",
+    "co2_rggi_allowances, co2_rggi_state_proceeds",
+    "co2_california_prices, co2_california_caps",
     "co2_icap_prices",
     "co2_world_bank",
     "co2_rff_pricing",
     "co2_vrod",
-    "co2_offsets_db",
-    "co2_cad_trust"
+    "co2_offsets_db"
   ),
   notes = c(
     "Largest ETS globally; covers ~10k installations in stationary sectors plus aviation.",
@@ -77,11 +74,10 @@ co2_markets_data <- data.frame(
     "Power sector only across 11 US states; quarterly auctions.",
     "Multi-sector; linked with Quebec (Western Climate Initiative); quarterly auctions.",
     "Curated price series across 20+ ETS; single best cross-market comparator.",
-    "Global annual dashboard of carbon pricing instruments.",
-    "Subnational historical coverage 1990-2020 (Dolphin, Pollitt, Newbery 2020).",
-    "Aggregates Verra, Gold Standard, ACR, CAR, ART TREES. Released quarterly.",
-    "API-based aggregator maintained by CarbonPlan; daily updates.",
-    "Article 6-aligned registry of registries; API launched Oct 2025."
+    "Global biannual dashboard of carbon pricing instruments.",
+    "National/subnational historical coverage (Dolphin, Pollitt, Newbery 2020).",
+    "Aggregates Verra, Gold Standard, ACR, CAR, ART TREES. Released bimonthly.",
+    "Daily S3 parquet snapshots maintained by CarbonPlan."
   ),
   stringsAsFactors = FALSE
 )

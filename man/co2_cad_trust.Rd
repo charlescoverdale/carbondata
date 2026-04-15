@@ -2,27 +2,34 @@
 % Please edit documentation in R/voluntary.R
 \name{co2_cad_trust}
 \alias{co2_cad_trust}
-\title{Climate Action Data Trust (CAD Trust)}
+\title{Climate Action Data Trust (not supported in v0.1.0)}
 \usage{
-co2_cad_trust(project_id = NULL, refresh = FALSE)
+co2_cad_trust(...)
 }
 \arguments{
-\item{project_id}{Optional character. Specific CAD Trust project ID.}
-
-\item{refresh}{Re-download? Default \code{FALSE}.}
+\item{...}{Ignored.}
 }
 \value{
-A data frame.
+Never returns (always errors).
 }
 \description{
-Queries the Climate Action Data Trust API for metadata on
-Article 6-aligned carbon credits. CAD Trust is a harmonised
-registry-of-registries launched by the World Bank, IETA, and
-partners. Public API access launched October 2025.
+CAD Trust is the Chia-Network "cadt" software designed to be
+self-hosted. There is no unauthenticated public API. To use CAD
+Trust data you must either:
+\itemize{
+\item Self-host a cadt node, or
+\item Arrange a private partnership for API access via
+\url{https://climateactiondata.org/how-to-connect/}
+}
+}
+\details{
+This function is a placeholder that errors with guidance. CAD Trust
+support is deferred to carbondata v0.2.0 once CAD Trust offers a
+stable public endpoint.
 }
 \examples{
 \dontrun{
-cad <- co2_cad_trust()
+co2_cad_trust()
 }
 }
 \seealso{

@@ -2,42 +2,33 @@
 % Please edit documentation in R/compliance.R
 \name{co2_ukets}
 \alias{co2_ukets}
-\title{UK Emissions Trading Scheme data}
+\title{UK ETS verified emissions and surrenders}
 \usage{
-co2_ukets(
-  type = c("price", "emissions", "allocations"),
-  from = NULL,
-  to = NULL,
-  refresh = FALSE
-)
+co2_ukets(refresh = FALSE)
 }
 \arguments{
-\item{type}{Character. \code{"price"} for UKA auction prices,
-\code{"emissions"} for verified emissions, \code{"allocations"} for free
-allocations.}
-
-\item{from, to}{Optional. Date range for price data.}
-
-\item{refresh}{Logical. Re-download? Default \code{FALSE}.}
+\item{refresh}{Re-download? Default \code{FALSE}.}
 }
 \value{
-A data frame. Columns depend on \code{type}.
+A data frame with one row per account-year.
 }
 \description{
-Fetches data from the UK ETS, which replaced the UK's participation
-in the EU ETS from 1 January 2021. Coverage: power sector and
-energy-intensive industry within the UK.
+Fetches the UK Emissions Trading Scheme Section 4 compliance
+report (verified emissions and allowance surrenders per account
+per scheme year), published annually by the UK Emissions Trading
+Registry after the 30 April reconciliation deadline.
 }
 \examples{
 \dontrun{
-op <- options(carbondata.cache_dir = tempdir())
-uka <- co2_ukets(type = "price", from = "2024-01-01")
-options(op)
+uk <- co2_ukets()
 }
 }
 \seealso{
 Other compliance markets: 
-\code{\link{co2_california}()},
-\code{\link{co2_rggi}()}
+\code{\link{co2_california_caps}()},
+\code{\link{co2_california_prices}()},
+\code{\link{co2_rggi_allowances}()},
+\code{\link{co2_rggi_state_proceeds}()},
+\code{\link{co2_ukets_allocations}()}
 }
 \concept{compliance markets}

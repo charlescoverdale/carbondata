@@ -4,30 +4,29 @@
 \alias{co2_rff_pricing}
 \title{RFF World Carbon Pricing Database}
 \usage{
-co2_rff_pricing(country = NULL, year = NULL, refresh = FALSE)
+co2_rff_pricing(country, version = "v2026.1", refresh = FALSE)
 }
 \arguments{
-\item{country}{Optional ISO 3-letter country codes.}
+\item{country}{Character. Country name using underscores
+(e.g. \code{"United_Kingdom"}, \code{"Germany"}, \code{"Antigua_and_Barbuda"}).}
 
-\item{year}{Optional integer years.}
+\item{version}{Character. Dataset version folder. Default
+\code{"v2026.1"}.}
 
 \item{refresh}{Re-download? Default \code{FALSE}.}
 }
 \value{
-A data frame.
+A data frame of annual carbon prices by IPCC sector code.
 }
 \description{
-Fetches the Resources for the Future (RFF) World Carbon Pricing
-Database compiled by Dolphin, Pollitt and Newbery (2020). Provides
-harmonised subnational and national carbon pricing from 1990 to
-2020 across 200+ jurisdictions. Published in Nature Scientific
-Data.
+Fetches the Dolphin-Pollitt-Newbery World Carbon Pricing Database
+for one country. Covers national-level carbon pricing from 1989
+to present, with CO2 tax and ETS instruments harmonised across
+200+ jurisdictions.
 }
 \examples{
 \dontrun{
-op <- options(carbondata.cache_dir = tempdir())
-rff <- co2_rff_pricing(country = "GBR")
-options(op)
+uk <- co2_rff_pricing("United_Kingdom")
 }
 }
 \references{

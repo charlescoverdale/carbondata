@@ -1,7 +1,7 @@
 test_that("co2_markets returns a data.frame", {
   m <- co2_markets()
   expect_s3_class(m, "data.frame")
-  expect_true(nrow(m) >= 10)
+  expect_true(nrow(m) >= 9)
   expect_named(m, c("market", "name", "type", "coverage_start",
                     "jurisdiction", "function_name", "notes"))
 })
@@ -20,7 +20,6 @@ test_that("co2_markets rejects invalid type", {
 
 test_that("every listed function exists as export", {
   m <- co2_markets()
-  # Each row's function_name lists one or more exports (comma-separated)
   all_fns <- unique(unlist(strsplit(m$function_name, ",\\s*")))
   for (fn in all_fns) {
     expect_true(exists(fn, mode = "function"),
