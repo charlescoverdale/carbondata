@@ -23,7 +23,7 @@ The catch is that the data is spread across dozens of jurisdictions, agencies, a
 - **Aggregators** (ICAP, World Bank Carbon Pricing Dashboard, RFF) publish curated cross-market series
 - **Emerging** (CAD Trust) provides a harmonised API but is still stabilising
 
-`carbondata` wraps the stable, free, API-accessible sources through a consistent R interface. The flaky Chinese-language and Korean-language ETS sources, and direct registry scraping for Verra/Gold Standard/Puro.earth, are deliberately out of scope for v0.1.0 — use aggregators (ICAP, VROD, OffsetsDB) for those instead.
+`carbondata` wraps the stable, free, API-accessible sources through a consistent R interface.
 
 
 ## Installation
