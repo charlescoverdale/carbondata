@@ -1,8 +1,7 @@
 # carbondata
 
 <!-- badges: start -->
-[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![CRAN status](https://www.r-pkg.org/badges/version/carbondata)](https://CRAN.R-project.org/package=carbondata) [![CRAN downloads](https://cranlogs.r-pkg.org/badges/carbondata)](https://cran.r-project.org/package=carbondata) [![Total Downloads](https://cranlogs.r-pkg.org/badges/grand-total/carbondata)](https://CRAN.R-project.org/package=carbondata) [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 <!-- badges: end -->
 
 Access carbon market data in R. Emissions trading system prices and verified emissions, voluntary carbon credit registrations and retirements, and global carbon pricing data from compliance and voluntary markets worldwide.
@@ -30,6 +29,9 @@ The catch is that the data is scattered across dozens of jurisdictions, agencies
 ## Installation
 
 ```r
+install.packages("carbondata")
+
+# Or install the development version from GitHub
 # install.packages("devtools")
 devtools::install_github("charlescoverdale/carbondata")
 ```
