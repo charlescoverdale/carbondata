@@ -19,8 +19,10 @@
 #' @family aggregators
 #' @export
 #' @examples
-#' \dontrun{
+#' \donttest{
+#' op <- options(carbondata.cache_dir = tempdir())
 #' prices <- co2_icap_prices(jurisdiction = "EU ETS")
+#' options(op)
 #' }
 co2_icap_prices <- function(jurisdiction = NULL, refresh = FALSE) {
   url <- "https://allowancepriceexplorer.icapcarbonaction.com/api/systems"
@@ -81,8 +83,10 @@ co2_icap_prices <- function(jurisdiction = NULL, refresh = FALSE) {
 #' @family aggregators
 #' @export
 #' @examples
-#' \dontrun{
+#' \donttest{
+#' op <- options(carbondata.cache_dir = tempdir())
 #' wb <- co2_world_bank()
+#' options(op)
 #' }
 co2_world_bank <- function(refresh = FALSE) {
   page_url <- "https://carbonpricingdashboard.worldbank.org/about"
@@ -134,8 +138,10 @@ co2_world_bank <- function(refresh = FALSE) {
 #' @family aggregators
 #' @export
 #' @examples
-#' \dontrun{
+#' \donttest{
+#' op <- options(carbondata.cache_dir = tempdir())
 #' uk <- co2_rff_pricing("United_Kingdom")
+#' options(op)
 #' }
 co2_rff_pricing <- function(country, version = "v2026.1", refresh = FALSE) {
   if (missing(country) || !is.character(country) || length(country) != 1L) {

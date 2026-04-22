@@ -36,6 +36,8 @@ Same source file as \code{\link[=co2_euets_emissions]{co2_euets_emissions()}}.
 }
 \examples{
 \dontrun{
+# DG CLIMA file schema drifted in 2026; parser needs updating.
+# Tracked at https://github.com/charlescoverdale/carbondata/issues
 alloc <- co2_euets_allocations(country = "DE")
 }
 }

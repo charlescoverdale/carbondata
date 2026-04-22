@@ -22,8 +22,10 @@ includes a media GUID that changes when DESNZ republishes, so the
 package scrapes the stable publications landing page.
 }
 \examples{
-\dontrun{
+\donttest{
+op <- options(carbondata.cache_dir = tempdir())
 alloc <- co2_ukets_allocations()
+options(op)
 }
 }
 \seealso{

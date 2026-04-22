@@ -25,8 +25,10 @@ to present, with CO2 tax and ETS instruments harmonised across
 200+ jurisdictions.
 }
 \examples{
-\dontrun{
+\donttest{
+op <- options(carbondata.cache_dir = tempdir())
 uk <- co2_rff_pricing("United_Kingdom")
+options(op)
 }
 }
 \references{

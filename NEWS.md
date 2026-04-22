@@ -1,3 +1,27 @@
+# carbondata 0.1.1
+
+CRAN policy compliance pass. No functional API changes.
+
+* Converted 14 of 17 `\dontrun{}` roxygen examples to `\donttest{}`.
+  These examples wrap public, unauthenticated data fetches from
+  'UK ETS', 'RGGI', California Cap-and-Trade, 'ICAP', World Bank,
+  'RFF', Berkeley VROD, and 'CarbonPlan OffsetsDB'. Each converted
+  example now also sets `options(carbondata.cache_dir = tempdir())`
+  around the call and restores the prior value afterwards, so
+  running the example on CRAN does not write to the user's home
+  filespace.
+* `co2_offsets_db()` example now guards the `arrow::read_parquet()`
+  call with `requireNamespace("arrow", quietly = TRUE)` so the
+  example does not error when `arrow` (in Suggests) is not
+  installed.
+* Three `\dontrun{}` remain:
+  - `co2_euets_emissions()` and `co2_euets_allocations()`: DG CLIMA
+    wide-format file schema drifted in 2026, so these functions
+    currently abort. Marked `\dontrun{}` with a comment pending a
+    parser update.
+  - `co2_cad_trust()`: placeholder that always aborts (CAD Trust
+    has no unauthenticated public API).
+
 # carbondata 0.1.0
 
 * Initial CRAN release.

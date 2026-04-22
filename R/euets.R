@@ -63,6 +63,8 @@
 #' @export
 #' @examples
 #' \dontrun{
+#' # DG CLIMA file schema drifted in 2026; parser needs updating.
+#' # Tracked at https://github.com/charlescoverdale/carbondata/issues
 #' de <- co2_euets_emissions(country = "DE")
 #' }
 co2_euets_emissions <- function(country = NULL, year = NULL,
@@ -95,6 +97,8 @@ co2_euets_emissions <- function(country = NULL, year = NULL,
 #' @export
 #' @examples
 #' \dontrun{
+#' # DG CLIMA file schema drifted in 2026; parser needs updating.
+#' # Tracked at https://github.com/charlescoverdale/carbondata/issues
 #' alloc <- co2_euets_allocations(country = "DE")
 #' }
 co2_euets_allocations <- function(country = NULL, year = NULL,
@@ -131,8 +135,10 @@ co2_euets_allocations <- function(country = NULL, year = NULL,
 #' @family EU ETS
 #' @export
 #' @examples
-#' \dontrun{
+#' \donttest{
+#' op <- options(carbondata.cache_dir = tempdir())
 #' comp <- co2_euets_surrendered(country = "FR")
+#' options(op)
 #' }
 co2_euets_surrendered <- function(country = NULL, file_year = NULL,
                                   refresh = FALSE) {
@@ -196,8 +202,10 @@ co2_euets_surrendered <- function(country = NULL, file_year = NULL,
 #' @family EU ETS
 #' @export
 #' @examples
-#' \dontrun{
+#' \donttest{
+#' op <- options(carbondata.cache_dir = tempdir())
 #' inst <- co2_euets_installations(country = "PL")
+#' options(op)
 #' }
 co2_euets_installations <- function(country = NULL, refresh = FALSE) {
   uuid <- .euets_installations_uuid
@@ -246,8 +254,10 @@ co2_euets_installations <- function(country = NULL, refresh = FALSE) {
 #' @family EU ETS
 #' @export
 #' @examples
-#' \dontrun{
+#' \donttest{
+#' op <- options(carbondata.cache_dir = tempdir())
 #' prices <- co2_euets_price(year = 2025)
+#' options(op)
 #' }
 co2_euets_price <- function(from = NULL, to = NULL, year = NULL,
                             refresh = FALSE) {

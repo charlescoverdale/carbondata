@@ -22,8 +22,10 @@ rggi.org. Combining all states gives the full RGGI auction time
 series.
 }
 \examples{
-\dontrun{
+\donttest{
+op <- options(carbondata.cache_dir = tempdir())
 ny <- co2_rggi_state_proceeds("NY")
+options(op)
 }
 }
 \seealso{

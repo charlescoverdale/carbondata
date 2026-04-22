@@ -27,8 +27,10 @@ exists). For RGGI prices, use \code{\link[=co2_icap_prices]{co2_icap_prices()}} 
 \code{jurisdiction = "Regional Greenhouse Gas Initiative"}.
 }
 \examples{
-\dontrun{
+\donttest{
+op <- options(carbondata.cache_dir = tempdir())
 a <- co2_rggi_allowances(year = 2026)
+options(op)
 }
 }
 \seealso{

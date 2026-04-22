@@ -20,8 +20,10 @@ operator name, activity type, country, city, and permit details.
 Sourced from the DG CLIMA Union Registry snapshot.
 }
 \examples{
-\dontrun{
+\donttest{
+op <- options(carbondata.cache_dir = tempdir())
 inst <- co2_euets_installations(country = "PL")
+options(op)
 }
 }
 \seealso{

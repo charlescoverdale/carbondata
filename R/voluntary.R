@@ -18,8 +18,10 @@
 #' @family voluntary markets
 #' @export
 #' @examples
-#' \dontrun{
+#' \donttest{
+#' op <- options(carbondata.cache_dir = tempdir())
 #' vrod <- co2_vrod()
+#' options(op)
 #' }
 co2_vrod <- function(refresh = FALSE) {
   page_url <- "https://gspp.berkeley.edu/berkeley-carbon-trading-project/offsets-database"
@@ -71,9 +73,13 @@ co2_vrod <- function(refresh = FALSE) {
 #' @family voluntary markets
 #' @export
 #' @examples
-#' \dontrun{
+#' \donttest{
+#' op <- options(carbondata.cache_dir = tempdir())
 #' path <- co2_offsets_db("projects")
-#' df <- arrow::read_parquet(path)
+#' if (requireNamespace("arrow", quietly = TRUE)) {
+#'   df <- arrow::read_parquet(path)
+#' }
+#' options(op)
 #' }
 co2_offsets_db <- function(kind = c("projects", "credits"),
                            date = NULL, refresh = FALSE) {

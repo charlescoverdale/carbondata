@@ -21,8 +21,10 @@ project registrations and issuances. Released bimonthly under
 CC BY 4.0.
 }
 \examples{
-\dontrun{
+\donttest{
+op <- options(carbondata.cache_dir = tempdir())
 vrod <- co2_vrod()
+options(op)
 }
 }
 \seealso{

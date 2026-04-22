@@ -41,6 +41,8 @@ files published each April for the prior compliance year.
 }
 \examples{
 \dontrun{
+# DG CLIMA file schema drifted in 2026; parser needs updating.
+# Tracked at https://github.com/charlescoverdale/carbondata/issues
 de <- co2_euets_emissions(country = "DE")
 }
 }

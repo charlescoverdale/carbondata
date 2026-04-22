@@ -12,8 +12,10 @@
 #' @family compliance markets
 #' @export
 #' @examples
-#' \dontrun{
+#' \donttest{
+#' op <- options(carbondata.cache_dir = tempdir())
 #' uk <- co2_ukets()
+#' options(op)
 #' }
 co2_ukets <- function(refresh = FALSE) {
   index_url <- "https://reports.view-emissions-trading-registry.service.gov.uk/ets-reports/section4/section4.html"
@@ -53,8 +55,10 @@ co2_ukets <- function(refresh = FALSE) {
 #' @family compliance markets
 #' @export
 #' @examples
-#' \dontrun{
+#' \donttest{
+#' op <- options(carbondata.cache_dir = tempdir())
 #' alloc <- co2_ukets_allocations()
+#' options(op)
 #' }
 co2_ukets_allocations <- function(sector = c("installations", "aviation"),
                                   refresh = FALSE) {
@@ -109,8 +113,10 @@ co2_ukets_allocations <- function(sector = c("installations", "aviation"),
 #' @family compliance markets
 #' @export
 #' @examples
-#' \dontrun{
+#' \donttest{
+#' op <- options(carbondata.cache_dir = tempdir())
 #' a <- co2_rggi_allowances(year = 2026)
+#' options(op)
 #' }
 co2_rggi_allowances <- function(year = NULL, refresh = FALSE) {
   year <- year %||% as.integer(format(Sys.Date(), "%Y"))
@@ -147,8 +153,10 @@ co2_rggi_allowances <- function(year = NULL, refresh = FALSE) {
 #' @family compliance markets
 #' @export
 #' @examples
-#' \dontrun{
+#' \donttest{
+#' op <- options(carbondata.cache_dir = tempdir())
 #' ny <- co2_rggi_state_proceeds("NY")
+#' options(op)
 #' }
 co2_rggi_state_proceeds <- function(state, refresh = FALSE) {
   valid_states <- c("CT", "DE", "MA", "MD", "ME", "NH",
@@ -188,8 +196,10 @@ co2_rggi_state_proceeds <- function(state, refresh = FALSE) {
 #' @family compliance markets
 #' @export
 #' @examples
-#' \dontrun{
+#' \donttest{
+#' op <- options(carbondata.cache_dir = tempdir())
 #' prices <- co2_california_prices()
+#' options(op)
 #' }
 co2_california_prices <- function(refresh = FALSE) {
   url <- "https://ww2.arb.ca.gov/sites/default/files/2022-12/nc-allowance_prices.csv"
@@ -224,8 +234,10 @@ co2_california_prices <- function(refresh = FALSE) {
 #' @family compliance markets
 #' @export
 #' @examples
-#' \dontrun{
+#' \donttest{
+#' op <- options(carbondata.cache_dir = tempdir())
 #' caps <- co2_california_caps()
+#' options(op)
 #' }
 co2_california_caps <- function(refresh = FALSE) {
   url <- "https://ww2.arb.ca.gov/sites/default/files/2025-06/nc-OverallCaps.csv"

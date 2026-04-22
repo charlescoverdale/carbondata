@@ -1,6 +1,6 @@
 Package: carbondata
 Title: Access Carbon Market Data from Emissions Trading Systems and Voluntary Registries
-Version: 0.1.0
+Version: 0.1.1
 Authors@R:
     person("Charles", "Coverdale", , "charlesfcoverdale@gmail.com", role = c("aut", "cre"))
 Description: Unified access to carbon market data from compliance

@@ -19,8 +19,10 @@ per scheme year), published annually by the UK Emissions Trading
 Registry after the 30 April reconciliation deadline.
 }
 \examples{
-\dontrun{
+\donttest{
+op <- options(carbondata.cache_dir = tempdir())
 uk <- co2_ukets()
+options(op)
 }
 }
 \seealso{

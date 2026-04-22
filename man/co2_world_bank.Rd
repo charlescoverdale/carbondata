@@ -22,8 +22,10 @@ The World Bank publishes a dated file every 6-12 months. This
 function scrapes the landing page to find the latest release.
 }
 \examples{
-\dontrun{
+\donttest{
+op <- options(carbondata.cache_dir = tempdir())
 wb <- co2_world_bank()
+options(op)
 }
 }
 \seealso{

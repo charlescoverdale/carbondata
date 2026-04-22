@@ -24,8 +24,10 @@ Korea, and other jurisdictions with auction and secondary-market
 prices where available.
 }
 \examples{
-\dontrun{
+\donttest{
+op <- options(carbondata.cache_dir = tempdir())
 prices <- co2_icap_prices(jurisdiction = "EU ETS")
+options(op)
 }
 }
 \seealso{

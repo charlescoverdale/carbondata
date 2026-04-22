@@ -19,8 +19,10 @@ price time series, updated quarterly after each joint California-
 Quebec auction.
 }
 \examples{
-\dontrun{
+\donttest{
+op <- options(carbondata.cache_dir = tempdir())
 prices <- co2_california_prices()
+options(op)
 }
 }
 \seealso{

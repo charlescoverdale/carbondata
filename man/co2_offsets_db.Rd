@@ -32,9 +32,13 @@ reading requires an installed Parquet reader; the \code{arrow}
 package is the recommended suggest.
 }
 \examples{
-\dontrun{
+\donttest{
+op <- options(carbondata.cache_dir = tempdir())
 path <- co2_offsets_db("projects")
-df <- arrow::read_parquet(path)
+if (requireNamespace("arrow", quietly = TRUE)) {
+  df <- arrow::read_parquet(path)
+}
+options(op)
 }
 }
 \seealso{
