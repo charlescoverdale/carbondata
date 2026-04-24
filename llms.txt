@@ -2,6 +2,8 @@
 
 > Unified access to carbon market data from compliance emissions trading systems ('EU ETS', 'UK ETS', 'RGGI', California Cap-and-Trade) and voluntary carbon markets (Verra, Gold Standard, American Ca... Install with `install.packages("carbondata")`.
 
+Full API reference (for agents): https://raw.githubusercontent.com/charlescoverdale/carbondata/main/llms-full.txt
+
 Version: 0.1.1. License: MIT.
 
 ## Functions

@@ -1,0 +1,660 @@
+# carbondata — full API reference
+
+> Unified access to carbon market data from compliance emissions trading systems ('EU ETS', 'UK ETS', 'RGGI', California Cap-and-Trade) and voluntary carbon markets (Verra, Gold Standard, American Ca...
+
+- Version: 0.1.1
+- Install: `install.packages("carbondata")`
+- CRAN: https://CRAN.R-project.org/package=carbondata
+- GitHub: https://github.com/charlescoverdale/carbondata
+- Reference site: https://charlescoverdale.github.io/carbondata/
+
+This file is a self-contained reference for LLM agents: every exported
+function with its signature, arguments, return value, and example.
+
+---
+
+## `co2_cache_info()`
+
+**Inspect the local carbondata cache**
+
+Returns information about the local cache: directory, file count, size, and list of cached files. Useful for debugging stale results or deciding whether to call `co2_clear_cache()`.
+
+**Usage**
+
+```r
+co2_cache_info()
+```
+
+**Returns**
+
+A list with elements `dir`, `n_files`, `size_bytes`, `size_human`, and `files` (a data frame with `name`, `size_bytes`, `modified`).
+
+**Example**
+
+```r
+op <- options(carbondata.cache_dir = tempdir())
+co2_cache_info()
+options(op)
+```
+
+---
+
+## `co2_cad_trust()`
+
+**Climate Action Data Trust (not supported in v0.1.0)**
+
+CAD Trust is the Chia-Network "cadt" software designed to be self-hosted. There is no unauthenticated public API. To use CAD Trust data you must either: Self-host a cadt node, or Arrange a private partnership for API access via https://climateactiondata.org/how-to-connect/
+
+**Usage**
+
+```r
+co2_cad_trust(...)
+```
+
+**Arguments**
+
+- `...` — Ignored.
+
+**Returns**
+
+Never returns (always errors).
+
+**Example**
+
+```r
+co2_cad_trust()
+```
+
+---
+
+## `co2_california_caps()`
+
+**California overall emissions caps**
+
+Fetches the California Cap-and-Trade program overall cap and allocation channels, by vintage year.
+
+**Usage**
+
+```r
+co2_california_caps(refresh = FALSE)
+```
+
+**Arguments**
+
+- `refresh` — Re-download? Default `FALSE`.
+
+**Returns**
+
+A data frame.
+
+**Example**
+
+```r
+op <- options(carbondata.cache_dir = tempdir())
+caps <- co2_california_caps()
+options(op)
+```
+
+---
+
+## `co2_california_prices()`
+
+**California Cap-and-Trade auction settlement prices**
+
+Fetches the California Air Resources Board auction settlement price time series, updated quarterly after each joint California- Quebec auction.
+
+**Usage**
+
+```r
+co2_california_prices(refresh = FALSE)
+```
+
+**Arguments**
+
+- `refresh` — Re-download? Default `FALSE`.
+
+**Returns**
+
+A data frame with `joint_auction`, `quarter`, `settlement_price_usd`, `reserve_price_usd`.
+
+**Example**
+
+```r
+op <- options(carbondata.cache_dir = tempdir())
+prices <- co2_california_prices()
+options(op)
+```
+
+---
+
+## `co2_clear_cache()`
+
+**Clear the carbondata cache**
+
+Deletes all locally cached carbon market data files. The next call to any data function will re-download.
+
+**Usage**
+
+```r
+co2_clear_cache()
+```
+
+**Returns**
+
+Invisibly returns `NULL`.
+
+**Example**
+
+```r
+op <- options(carbondata.cache_dir = tempdir())
+co2_clear_cache()
+options(op)
+```
+
+---
+
+## `co2_euets_allocations()`
+
+**EU ETS free allowance allocations**
+
+Returns free allowance allocations per installation per year. Same source file as `co2_euets_emissions()`.
+
+**Usage**
+
+```r
+co2_euets_allocations(
+  country = NULL,
+  year = NULL,
+  file_year = NULL,
+  refresh = FALSE
+)
+```
+
+**Arguments**
+
+- `country` — Optional character vector of two-letter registry codes to filter (e.g. `c("DE", "FR", "PL")`).
+- `year` — Optional integer vector of emissions years. When `NULL`, returns all years in the latest published file. Note that the file year (e.g. "2025") refers to publication year; emissions data covers calendar years up to publication year -1.
+- `file_year` — Publication year of the DG CLIMA file to use. Default is the latest year available in the package (see `co2_euets_files()`).
+- `refresh` — Logical. Re-download? Default `FALSE`.
+
+**Returns**
+
+A data frame with `country`, `installation_id`, `year`, `allocation_eua`.
+
+**Example**
+
+```r
+# DG CLIMA file schema drifted in 2026; parser needs updating.
+# Tracked at https://github.com/charlescoverdale/carbondata/issues
+alloc <- co2_euets_allocations(country = "DE")
+```
+
+---
+
+## `co2_euets_emissions()`
+
+**EU ETS verified emissions**
+
+Fetches annual verified greenhouse-gas emissions for installations covered by the EU Emissions Trading System, from the DG CLIMA Union Registry bulk download. Coverage: ~10,000 stationary installations plus ~1,500 aircraft operators across the EU, EEA, and linked Swiss ETS. Emissions data from 2005 onwards; annual files published each April for the prior compliance year.
+
+**Usage**
+
+```r
+co2_euets_emissions(
+  country = NULL,
+  year = NULL,
+  file_year = NULL,
+  refresh = FALSE
+)
+```
+
+**Arguments**
+
+- `country` — Optional character vector of two-letter registry codes to filter (e.g. `c("DE", "FR", "PL")`).
+- `year` — Optional integer vector of emissions years. When `NULL`, returns all years in the latest published file. Note that the file year (e.g. "2025") refers to publication year; emissions data covers calendar years up to publication year -1.
+- `file_year` — Publication year of the DG CLIMA file to use. Default is the latest year available in the package (see `co2_euets_files()`).
+- `refresh` — Logical. Re-download? Default `FALSE`.
+
+**Returns**
+
+A data frame with columns `country`, `installation_id`, `installation_name`, `activity`, `year`, `verified_emissions_tco2e`, `allocation_eua`.
+
+**Example**
+
+```r
+# DG CLIMA file schema drifted in 2026; parser needs updating.
+# Tracked at https://github.com/charlescoverdale/carbondata/issues
+de <- co2_euets_emissions(country = "DE")
+```
+
+---
+
+## `co2_euets_files()`
+
+**List the EU ETS data file versions bundled with this package**
+
+Returns a data frame of the DG CLIMA file vintages supported. When DG CLIMA publishes a newer file, upgrade the package.
+
+**Usage**
+
+```r
+co2_euets_files()
+```
+
+**Returns**
+
+A data frame.
+
+**Example**
+
+```r
+co2_euets_files()
+```
+
+---
+
+## `co2_euets_installations()`
+
+**EU ETS installation registry**
+
+Returns the registry of stationary EU ETS installations with operator name, activity type, country, city, and permit details. Sourced from the DG CLIMA Union Registry snapshot.
+
+**Usage**
+
+```r
+co2_euets_installations(country = NULL, refresh = FALSE)
+```
+
+**Arguments**
+
+- `country` — Optional two-letter registry codes.
+- `refresh` — Re-download? Default `FALSE`.
+
+**Returns**
+
+A data frame.
+
+**Example**
+
+```r
+op <- options(carbondata.cache_dir = tempdir())
+inst <- co2_euets_installations(country = "PL")
+options(op)
+```
+
+---
+
+## `co2_euets_price()`
+
+**EU ETS allowance (EUA) auction settlement prices**
+
+Fetches EU Allowance (EUA) primary-auction settlement prices from the EEX public auction report. Auctions are held several times per week; each year's file accumulates all auctions for that year.
+
+**Usage**
+
+```r
+co2_euets_price(from = NULL, to = NULL, year = NULL, refresh = FALSE)
+```
+
+**Arguments**
+
+- `from, to` — Optional character or Date. Date range.
+- `year` — Optional integer year. If supplied, only the file for that year is fetched (faster than `from`/`to`).
+- `refresh` — Re-download? Default `FALSE`.
+
+**Returns**
+
+A data frame with `date`, `auction_name`, `contract`, `status`, `price_eur`, `min_bid_eur`, `max_bid_eur`, `volume_t`.
+
+**Example**
+
+```r
+op <- options(carbondata.cache_dir = tempdir())
+prices <- co2_euets_price(year = 2025)
+options(op)
+```
+
+---
+
+## `co2_euets_surrendered()`
+
+**EU ETS compliance status and cumulative surrendered units**
+
+Returns cumulative total surrendered allowances per installation, compliance code, and account closure date. Per-year surrender events require the EUTL transaction log ZIP, which is deferred to v0.2.0 because it is ~1.5 GB uncompressed and requires LZMA extraction.
+
+**Usage**
+
+```r
+co2_euets_surrendered(country = NULL, file_year = NULL, refresh = FALSE)
+```
+
+**Arguments**
+
+- `country` — Optional two-letter registry codes.
+- `file_year` — Publication year of the compliance file. Default is the latest in the package.
+- `refresh` — Re-download? Default `FALSE`.
+
+**Returns**
+
+A data frame with `country`, `installation_id`, `installation_name`, `compliance_code`, `compliance_status`, `total_verified_emissions`, `total_surrendered_allowances`, `year_of_first_emissions`, `year_of_last_emissions`, `account_closure`.
+
+**Example**
+
+```r
+op <- options(carbondata.cache_dir = tempdir())
+comp <- co2_euets_surrendered(country = "FR")
+options(op)
+```
+
+---
+
+## `co2_icap_prices()`
+
+**ICAP Allowance Price Explorer**
+
+Fetches allowance prices across 20+ Emissions Trading Systems from the International Carbon Action Partnership (ICAP) Allowance Price Explorer. Covers EU ETS, UK ETS, California, RGGI, New Zealand, Korea, and other jurisdictions with auction and secondary-market prices where available.
+
+**Usage**
+
+```r
+co2_icap_prices(jurisdiction = NULL, refresh = FALSE)
+```
+
+**Arguments**
+
+- `jurisdiction` — Optional character vector. Filter by jurisdiction name (e.g. `c("Regional Greenhouse Gas Initiative", "EU ETS")`). When `NULL`, returns all.
+- `refresh` — Re-download? Default `FALSE`.
+
+**Returns**
+
+A data frame with `date`, `jurisdiction`, `market_type` (`"primary"` auction or `"secondary"`), `price`, and `currency`.
+
+**Example**
+
+```r
+op <- options(carbondata.cache_dir = tempdir())
+prices <- co2_icap_prices(jurisdiction = "EU ETS")
+options(op)
+```
+
+---
+
+## `co2_markets()`
+
+**List supported carbon markets**
+
+Returns a data frame of the carbon markets (compliance and voluntary) supported by this package, with coverage metadata.
+
+**Usage**
+
+```r
+co2_markets(type = c("all", "compliance", "voluntary"))
+```
+
+**Arguments**
+
+- `type` — Character. One of `"all"` (default), `"compliance"`, or `"voluntary"`.
+
+**Returns**
+
+A data frame with columns `market`, `name`, `type`, `coverage_start`, `jurisdiction`, `function_name`, and `notes`.
+
+**Example**
+
+```r
+co2_markets()
+co2_markets(type = "compliance")
+```
+
+---
+
+## `co2_offsets_db()`
+
+**CarbonPlan OffsetsDB (via S3 parquet)**
+
+Fetches the CarbonPlan OffsetsDB daily snapshots of voluntary carbon market projects and credits, stored as Parquet in a public S3 bucket. Covers Verra, ART TREES, Gold Standard, American Carbon Registry, and Climate Action Reserve.
+
+**Usage**
+
+```r
+co2_offsets_db(kind = c("projects", "credits"), date = NULL, refresh = FALSE)
+```
+
+**Arguments**
+
+- `kind` — Character. `"projects"` (default) or `"credits"`.
+- `date` — Optional character. ISO date of the snapshot to fetch (must be a day CarbonPlan published; the function walks backwards from this date up to 7 days). Default `Sys.Date()`.
+- `refresh` — Re-download? Default `FALSE`.
+
+**Returns**
+
+A file path to the downloaded Parquet file. The caller must have `arrow` or `nanoparquet` installed to read it.
+
+**Example**
+
+```r
+op <- options(carbondata.cache_dir = tempdir())
+path <- co2_offsets_db("projects")
+if (requireNamespace("arrow", quietly = TRUE)) {
+  df <- arrow::read_parquet(path)
+}
+options(op)
+```
+
+---
+
+## `co2_rff_pricing()`
+
+**RFF World Carbon Pricing Database**
+
+Fetches the Dolphin-Pollitt-Newbery World Carbon Pricing Database for one country. Covers national-level carbon pricing from 1989 to present, with CO2 tax and ETS instruments harmonised across 200+ jurisdictions.
+
+**Usage**
+
+```r
+co2_rff_pricing(country, version = "v2026.1", refresh = FALSE)
+```
+
+**Arguments**
+
+- `country` — Character. Country name using underscores (e.g. `"United_Kingdom"`, `"Germany"`, `"Antigua_and_Barbuda"`).
+- `version` — Character. Dataset version folder. Default `"v2026.1"`.
+- `refresh` — Re-download? Default `FALSE`.
+
+**Returns**
+
+A data frame of annual carbon prices by IPCC sector code.
+
+**Example**
+
+```r
+op <- options(carbondata.cache_dir = tempdir())
+uk <- co2_rff_pricing("United_Kingdom")
+options(op)
+```
+
+---
+
+## `co2_rggi_allowances()`
+
+**RGGI allowance distribution by state and year**
+
+Fetches the Regional Greenhouse Gas Initiative (RGGI) annual CO2 allowance distribution table from the public RGGI website. Covers 11 participating US states from 2009 onwards.
+
+**Usage**
+
+```r
+co2_rggi_allowances(year = NULL, refresh = FALSE)
+```
+
+**Arguments**
+
+- `year` — Integer year (2009-present). Default is the current year.
+- `refresh` — Re-download? Default `FALSE`.
+
+**Returns**
+
+A data frame of allowance distribution by state.
+
+**Example**
+
+```r
+op <- options(carbondata.cache_dir = tempdir())
+a <- co2_rggi_allowances(year = 2026)
+options(op)
+```
+
+---
+
+## `co2_rggi_state_proceeds()`
+
+**RGGI cumulative state proceeds by auction**
+
+Fetches cumulative auction proceeds time series for one RGGI state, indexed by auction number. Derived from the per-state XLSX files on rggi.org. Combining all states gives the full RGGI auction time series.
+
+**Usage**
+
+```r
+co2_rggi_state_proceeds(state, refresh = FALSE)
+```
+
+**Arguments**
+
+- `state` — Two-letter state code (one of: CT, DE, MA, MD, ME, NH, NJ, NY, RI, VA, VT).
+- `refresh` — Re-download? Default `FALSE`.
+
+**Returns**
+
+A data frame.
+
+**Example**
+
+```r
+op <- options(carbondata.cache_dir = tempdir())
+ny <- co2_rggi_state_proceeds("NY")
+options(op)
+```
+
+---
+
+## `co2_ukets()`
+
+**UK ETS verified emissions and surrenders**
+
+Fetches the UK Emissions Trading Scheme Section 4 compliance report (verified emissions and allowance surrenders per account per scheme year), published annually by the UK Emissions Trading Registry after the 30 April reconciliation deadline.
+
+**Usage**
+
+```r
+co2_ukets(refresh = FALSE)
+```
+
+**Arguments**
+
+- `refresh` — Re-download? Default `FALSE`.
+
+**Returns**
+
+A data frame with one row per account-year.
+
+**Example**
+
+```r
+op <- options(carbondata.cache_dir = tempdir())
+uk <- co2_ukets()
+options(op)
+```
+
+---
+
+## `co2_ukets_allocations()`
+
+**UK ETS free allocations**
+
+Fetches the UK ETS free-allocation table for stationary installations (OHA) published by DESNZ on GOV.UK. Filename includes a media GUID that changes when DESNZ republishes, so the package scrapes the stable publications landing page.
+
+**Usage**
+
+```r
+co2_ukets_allocations(sector = c("installations", "aviation"), refresh = FALSE)
+```
+
+**Arguments**
+
+- `sector` — Character. `"installations"` (default) for stationary installations, `"aviation"` for aviation allocations.
+- `refresh` — Re-download? Default `FALSE`.
+
+**Returns**
+
+A data frame.
+
+**Example**
+
+```r
+op <- options(carbondata.cache_dir = tempdir())
+alloc <- co2_ukets_allocations()
+options(op)
+```
+
+---
+
+## `co2_vrod()`
+
+**Berkeley Voluntary Registry Offsets Database**
+
+Fetches the Berkeley GSPP Voluntary Registry Offsets Database, an aggregator of Verra, Gold Standard, ACR, CAR, and ART TREES project registrations and issuances. Released bimonthly under CC BY 4.0.
+
+**Usage**
+
+```r
+co2_vrod(refresh = FALSE)
+```
+
+**Arguments**
+
+- `refresh` — Re-download? Default `FALSE`. Each release has a date-stamped filename; the package scrapes the landing page to find the latest release on each call unless a cached copy exists.
+
+**Returns**
+
+A data frame of project-level data.
+
+**Example**
+
+```r
+op <- options(carbondata.cache_dir = tempdir())
+vrod <- co2_vrod()
+options(op)
+```
+
+---
+
+## `co2_world_bank()`
+
+**World Bank Carbon Pricing Dashboard**
+
+Fetches the World Bank Carbon Pricing Dashboard Excel file, which covers 70+ carbon pricing initiatives worldwide (carbon taxes + ETS) with price, coverage, and revenue data.
+
+**Usage**
+
+```r
+co2_world_bank(refresh = FALSE)
+```
+
+**Arguments**
+
+- `refresh` — Re-download? Default `FALSE`.
+
+**Returns**
+
+A data frame.
+
+**Example**
+
+```r
+op <- options(carbondata.cache_dir = tempdir())
+wb <- co2_world_bank()
+options(op)
+```
+
+---
+
