@@ -13,7 +13,7 @@ CRAN policy compliance pass. No functional API changes.
   CRAN does not write to the user’s home filespace.
 - [`co2_offsets_db()`](https://charlescoverdale.github.io/carbondata/reference/co2_offsets_db.md)
   example now guards the
-  [`arrow::read_parquet()`](https://rdrr.io/pkg/arrow/man/read_parquet.html)
+  [`arrow::read_parquet()`](https://arrow.apache.org/docs/r/reference/read_parquet.html)
   call with
   [`requireNamespace("arrow", quietly = TRUE)`](https://rdrr.io/r/base/ns-load.html)
   so the example does not error when `arrow` (in Suggests) is not

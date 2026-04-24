@@ -35,12 +35,7 @@ Other voluntary markets:
 op <- options(carbondata.cache_dir = tempdir())
 vrod <- co2_vrod()
 #> ℹ Resolving latest VROD release...
-#> Error in value[[3L]](cond): Failed to reach landing page
-#> <https://gspp.berkeley.edu/berkeley-carbon-trading-project/offsets-database>.
-#> ✖ Failed to perform HTTP request. Caused by error in
-#>   `curl::curl_fetch_memory()`: ! Timeout was reached [gspp.berkeley.edu]:
-#>   Failed to connect to gspp.berkeley.edu port 443 after 10001 ms: Timeout was
-#>   reached
+#> ℹ Downloading Voluntary-Registry-Offsets-Database--v2026-02.xlsx (~16 MB)...
 options(op)
 # }
 ```
