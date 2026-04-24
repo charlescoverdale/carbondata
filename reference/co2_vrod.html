@@ -78,7 +78,12 @@ find the latest release on each call unless a cached copy exists.</p></dd>
 <span class="r-in"><span><span class="va">op</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>carbondata.cache_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">vrod</span> <span class="op">&lt;-</span> <span class="fu">co2_vrod</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Resolving latest VROD release...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Downloading <span style="color: #0000BB;">Voluntary-Registry-Offsets-Database--v2026-02.xlsx</span> (~16 MB)...</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in value[[3L]](cond):</span> Failed to reach landing page</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB; font-style: italic;">&lt;https://gspp.berkeley.edu/berkeley-carbon-trading-project/offsets-database&gt;</span>.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #BB0000;">✖</span> Failed to perform HTTP request. <span style="font-weight: bold;">Caused by error in</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>   <span style="font-weight: bold;">`curl::curl_fetch_memory()`:</span> <span style="color: #BBBB00;">!</span> Timeout was reached [gspp.berkeley.edu]:</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>   Failed to connect to gspp.berkeley.edu port 443 after 10001 ms: Timeout was</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>   reached</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="va">op</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
