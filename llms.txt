@@ -1,0 +1,36 @@
+# carbondata
+
+> Unified access to carbon market data from compliance emissions trading systems ('EU ETS', 'UK ETS', 'RGGI', California Cap-and-Trade) and voluntary carbon markets (Verra, Gold Standard, American Ca... Install with `install.packages("carbondata")`.
+
+Version: 0.1.1. License: MIT.
+
+## Functions
+
+- [`co2_cache_info()`](https://charlescoverdale.github.io/carbondata/reference/co2_cache_info.html): Inspect the local carbondata cache
+- [`co2_cad_trust()`](https://charlescoverdale.github.io/carbondata/reference/co2_cad_trust.html): Climate Action Data Trust (not supported in v0.1.0)
+- [`co2_california_caps()`](https://charlescoverdale.github.io/carbondata/reference/co2_california_caps.html): California overall emissions caps
+- [`co2_california_prices()`](https://charlescoverdale.github.io/carbondata/reference/co2_california_prices.html): California Cap-and-Trade auction settlement prices
+- [`co2_clear_cache()`](https://charlescoverdale.github.io/carbondata/reference/co2_clear_cache.html): Clear the carbondata cache
+- [`co2_euets_allocations()`](https://charlescoverdale.github.io/carbondata/reference/co2_euets_allocations.html): EU ETS free allowance allocations
+- [`co2_euets_emissions()`](https://charlescoverdale.github.io/carbondata/reference/co2_euets_emissions.html): EU ETS verified emissions
+- [`co2_euets_files()`](https://charlescoverdale.github.io/carbondata/reference/co2_euets_files.html): List the EU ETS data file versions bundled with this package
+- [`co2_euets_installations()`](https://charlescoverdale.github.io/carbondata/reference/co2_euets_installations.html): EU ETS installation registry
+- [`co2_euets_price()`](https://charlescoverdale.github.io/carbondata/reference/co2_euets_price.html): EU ETS allowance (EUA) auction settlement prices
+- [`co2_euets_surrendered()`](https://charlescoverdale.github.io/carbondata/reference/co2_euets_surrendered.html): EU ETS compliance status and cumulative surrendered units
+- [`co2_icap_prices()`](https://charlescoverdale.github.io/carbondata/reference/co2_icap_prices.html): ICAP Allowance Price Explorer
+- [`co2_markets()`](https://charlescoverdale.github.io/carbondata/reference/co2_markets.html): List supported carbon markets
+- [`co2_offsets_db()`](https://charlescoverdale.github.io/carbondata/reference/co2_offsets_db.html): CarbonPlan OffsetsDB (via S3 parquet)
+- [`co2_rff_pricing()`](https://charlescoverdale.github.io/carbondata/reference/co2_rff_pricing.html): RFF World Carbon Pricing Database
+- [`co2_rggi_allowances()`](https://charlescoverdale.github.io/carbondata/reference/co2_rggi_allowances.html): RGGI allowance distribution by state and year
+- [`co2_rggi_state_proceeds()`](https://charlescoverdale.github.io/carbondata/reference/co2_rggi_state_proceeds.html): RGGI cumulative state proceeds by auction
+- [`co2_ukets()`](https://charlescoverdale.github.io/carbondata/reference/co2_ukets.html): UK ETS verified emissions and surrenders
+- [`co2_ukets_allocations()`](https://charlescoverdale.github.io/carbondata/reference/co2_ukets_allocations.html): UK ETS free allocations
+- [`co2_vrod()`](https://charlescoverdale.github.io/carbondata/reference/co2_vrod.html): Berkeley Voluntary Registry Offsets Database
+- [`co2_world_bank()`](https://charlescoverdale.github.io/carbondata/reference/co2_world_bank.html): World Bank Carbon Pricing Dashboard
+
+## Documentation
+
+- [Full reference](https://charlescoverdale.github.io/carbondata/reference/)
+- [GitHub](https://github.com/charlescoverdale/carbondata)
+- [CRAN](https://CRAN.R-project.org/package=carbondata)
+

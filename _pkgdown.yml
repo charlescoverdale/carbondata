@@ -1,0 +1,48 @@
+url: https://charlescoverdale.github.io/carbondata/
+
+template:
+  bootstrap: 5
+
+navbar:
+  structure:
+    left:  [intro, reference, articles, news]
+    right: [search, github]
+
+reference:
+  - title: "Compliance Markets"
+    desc: "ETS allowances, prices, and allocation data"
+    contents:
+      - co2_euets_price
+      - co2_euets_allocations
+      - co2_euets_emissions
+      - co2_euets_surrendered
+      - co2_euets_installations
+      - co2_euets_files
+      - co2_ukets
+      - co2_ukets_allocations
+      - co2_california_prices
+      - co2_california_caps
+      - co2_rggi_allowances
+      - co2_rggi_state_proceeds
+      - co2_icap_prices
+
+  - title: "Voluntary Markets"
+    desc: "Verra, Gold Standard, ACR, CAR, and offset databases"
+    contents:
+      - co2_vrod
+      - co2_offsets_db
+      - co2_cad_trust
+
+  - title: "Policy and Pricing"
+    desc: "World Bank and RFF carbon pricing data"
+    contents:
+      - co2_world_bank
+      - co2_rff_pricing
+
+  - title: "General"
+    desc: "Market index and cache"
+    contents:
+      - co2_markets
+      - co2_cache_info
+      - co2_clear_cache
+
