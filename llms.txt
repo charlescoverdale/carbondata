@@ -267,3 +267,10 @@ Market index and cache
 - [`co2_clear_cache()`](https://charlescoverdale.github.io/carbondata/reference/co2_clear_cache.md)
   : Clear the carbondata cache
 
+## Package
+
+- [`carbondata`](https://charlescoverdale.github.io/carbondata/reference/carbondata-package.md)
+  [`carbondata-package`](https://charlescoverdale.github.io/carbondata/reference/carbondata-package.md)
+  : carbondata: Access Carbon Market Data from Emissions Trading Systems
+  and Voluntary Registries
+
