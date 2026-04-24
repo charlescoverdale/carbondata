@@ -46,3 +46,7 @@ reference:
       - co2_cache_info
       - co2_clear_cache
 
+
+  - title: "Package"
+    contents:
+      - carbondata-package
