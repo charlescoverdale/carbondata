@@ -167,10 +167,12 @@ Downloads are cached to `tools::R_user_dir("carbondata", "cache")` by default. S
 
 | Package | Description |
 |---------|-------------|
-| [carbonr](https://cran.r-project.org/package=carbonr) | Carbon footprint calculator (activity → tCO2e conversion) |
+| [cer](https://github.com/charlescoverdale/cer) | Australian Clean Energy Regulator (ACCUs, Safeguard, NGER) |
+| [aemo](https://github.com/charlescoverdale/aemo) | Australian Energy Market Operator (NEM prices, dispatch) |
 | [climatekit](https://github.com/charlescoverdale/climatekit) | Climate indices (temperature, precipitation, drought) |
 | [readnoaa](https://github.com/charlescoverdale/readnoaa) | NOAA climate and weather data |
-| [inflationkit](https://github.com/charlescoverdale/inflationkit) | Inflation analysis |
+| [inflationkit](https://github.com/charlescoverdale/inflationkit) | Inflation analysis (real-terms carbon prices) |
+| [carbonr](https://cran.r-project.org/package=carbonr) | Carbon footprint calculator (activity → tCO2e conversion) |
 
 
 ## Issues
