@@ -52,7 +52,7 @@ Other voluntary markets:
 # \donttest{
 op <- options(carbondata.cache_dir = tempdir())
 path <- co2_offsets_db("projects")
-#> ℹ Downloading OffsetsDB projects snapshot from 2026-04-24...
+#> ℹ Downloading OffsetsDB projects snapshot from 2026-04-29...
 if (requireNamespace("arrow", quietly = TRUE)) {
   df <- arrow::read_parquet(path)
 }

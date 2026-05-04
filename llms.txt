@@ -49,6 +49,7 @@ normalisation so you can get on with the analysis.
 ## Installation
 
 ``` r
+
 install.packages("carbondata")
 
 # Or install the development version from GitHub
@@ -58,18 +59,18 @@ devtools::install_github("charlescoverdale/carbondata")
 
 ## Data sources covered
 
-| Source                                    | Coverage                                                                                                  |
-|-------------------------------------------|-----------------------------------------------------------------------------------------------------------|
+| Source | Coverage |
+|----|----|
 | **EU Emissions Trading System** (via EEA) | Verified emissions, free allocations, surrendered units, installation registry, EUA prices (2005-present) |
-| **UK Emissions Trading Scheme**           | UKA auction prices, verified emissions, allocations (2021-present)                                        |
-| **Regional Greenhouse Gas Initiative**    | Auction prices, emissions, allowance distribution (2009-present, US Northeast)                            |
-| **California Cap-and-Trade**              | Auction settlement prices, emissions, auction volumes (2013-present)                                      |
-| **ICAP Allowance Price Explorer**         | Curated cross-ETS prices (20+ jurisdictions globally)                                                     |
-| **World Bank Carbon Pricing Dashboard**   | Global carbon pricing: taxes + ETS (70+ initiatives)                                                      |
-| **RFF World Carbon Pricing Database**     | Subnational historical coverage 1990-2020 (Dolphin, Pollitt, Newbery 2020)                                |
-| **Berkeley VROD**                         | Voluntary market aggregator (Verra, Gold Standard, ACR, CAR, ART TREES)                                   |
-| **CarbonPlan OffsetsDB**                  | Voluntary market aggregator with REST API                                                                 |
-| **Climate Action Data Trust**             | Article 6-aligned harmonised registry API                                                                 |
+| **UK Emissions Trading Scheme** | UKA auction prices, verified emissions, allocations (2021-present) |
+| **Regional Greenhouse Gas Initiative** | Auction prices, emissions, allowance distribution (2009-present, US Northeast) |
+| **California Cap-and-Trade** | Auction settlement prices, emissions, auction volumes (2013-present) |
+| **ICAP Allowance Price Explorer** | Curated cross-ETS prices (20+ jurisdictions globally) |
+| **World Bank Carbon Pricing Dashboard** | Global carbon pricing: taxes + ETS (70+ initiatives) |
+| **RFF World Carbon Pricing Database** | Subnational historical coverage 1990-2020 (Dolphin, Pollitt, Newbery 2020) |
+| **Berkeley VROD** | Voluntary market aggregator (Verra, Gold Standard, ACR, CAR, ART TREES) |
+| **CarbonPlan OffsetsDB** | Voluntary market aggregator with REST API |
+| **Climate Action Data Trust** | Article 6-aligned harmonised registry API |
 
 All sources are free. None require registration for v0.1.0
 functionality.
@@ -77,6 +78,7 @@ functionality.
 ## Quick start
 
 ``` r
+
 library(carbondata)
 
 # All supported markets at a glance
@@ -101,6 +103,7 @@ verra_forestry <- co2_vrod(registry = "Verra", project_type = "Forestry")
 One chart, four compliance markets, 20 years of data.
 
 ``` r
+
 library(carbondata)
 
 icap <- co2_icap_prices(
@@ -120,6 +123,7 @@ Compliance markets (EU ETS) trade around USD 70/tCO2. Nature-based
 voluntary credits trade around USD 5/tCO2. Why the gap?
 
 ``` r
+
 # EU ETS average 2024 price
 eu <- co2_euets_price(from = "2024-01-01", to = "2024-12-31")
 mean(eu$price_eur, na.rm = TRUE)
@@ -134,45 +138,45 @@ summary(vrod$total_issuances)
 
 ### EU ETS (EEA / EUTL)
 
-| Function                                                                                                          | What it returns                             |
-|-------------------------------------------------------------------------------------------------------------------|---------------------------------------------|
-| [`co2_euets_emissions()`](https://charlescoverdale.github.io/carbondata/reference/co2_euets_emissions.md)         | Verified emissions by installation and year |
-| [`co2_euets_allocations()`](https://charlescoverdale.github.io/carbondata/reference/co2_euets_allocations.md)     | Free allowance allocations                  |
-| [`co2_euets_surrendered()`](https://charlescoverdale.github.io/carbondata/reference/co2_euets_surrendered.md)     | Surrendered units for compliance            |
-| [`co2_euets_price()`](https://charlescoverdale.github.io/carbondata/reference/co2_euets_price.md)                 | EUA auction settlement prices               |
-| [`co2_euets_installations()`](https://charlescoverdale.github.io/carbondata/reference/co2_euets_installations.md) | Installation registry                       |
+| Function | What it returns |
+|----|----|
+| [`co2_euets_emissions()`](https://charlescoverdale.github.io/carbondata/reference/co2_euets_emissions.md) | Verified emissions by installation and year |
+| [`co2_euets_allocations()`](https://charlescoverdale.github.io/carbondata/reference/co2_euets_allocations.md) | Free allowance allocations |
+| [`co2_euets_surrendered()`](https://charlescoverdale.github.io/carbondata/reference/co2_euets_surrendered.md) | Surrendered units for compliance |
+| [`co2_euets_price()`](https://charlescoverdale.github.io/carbondata/reference/co2_euets_price.md) | EUA auction settlement prices |
+| [`co2_euets_installations()`](https://charlescoverdale.github.io/carbondata/reference/co2_euets_installations.md) | Installation registry |
 
 ### Other compliance markets
 
-| Function                                                                              | What it returns                                      |
-|---------------------------------------------------------------------------------------|------------------------------------------------------|
-| [`co2_ukets()`](https://charlescoverdale.github.io/carbondata/reference/co2_ukets.md) | UK ETS prices, emissions, allocations                |
-| `co2_rggi()`                                                                          | RGGI prices, emissions, allowance distribution       |
-| `co2_california()`                                                                    | California Cap-and-Trade prices, emissions, auctions |
+| Function | What it returns |
+|----|----|
+| [`co2_ukets()`](https://charlescoverdale.github.io/carbondata/reference/co2_ukets.md) | UK ETS prices, emissions, allocations |
+| `co2_rggi()` | RGGI prices, emissions, allowance distribution |
+| `co2_california()` | California Cap-and-Trade prices, emissions, auctions |
 
 ### Cross-market aggregators
 
-| Function                                                                                          | What it returns                                  |
-|---------------------------------------------------------------------------------------------------|--------------------------------------------------|
+| Function | What it returns |
+|----|----|
 | [`co2_icap_prices()`](https://charlescoverdale.github.io/carbondata/reference/co2_icap_prices.md) | ICAP Allowance Price Explorer (multi-ETS prices) |
-| [`co2_world_bank()`](https://charlescoverdale.github.io/carbondata/reference/co2_world_bank.md)   | World Bank Carbon Pricing Dashboard              |
-| [`co2_rff_pricing()`](https://charlescoverdale.github.io/carbondata/reference/co2_rff_pricing.md) | RFF World Carbon Pricing Database                |
+| [`co2_world_bank()`](https://charlescoverdale.github.io/carbondata/reference/co2_world_bank.md) | World Bank Carbon Pricing Dashboard |
+| [`co2_rff_pricing()`](https://charlescoverdale.github.io/carbondata/reference/co2_rff_pricing.md) | RFF World Carbon Pricing Database |
 
 ### Voluntary markets
 
-| Function                                                                                        | What it returns                               |
-|-------------------------------------------------------------------------------------------------|-----------------------------------------------|
-| [`co2_vrod()`](https://charlescoverdale.github.io/carbondata/reference/co2_vrod.md)             | Berkeley VROD (5 registries aggregated)       |
-| [`co2_offsets_db()`](https://charlescoverdale.github.io/carbondata/reference/co2_offsets_db.md) | CarbonPlan OffsetsDB (REST API)               |
-| [`co2_cad_trust()`](https://charlescoverdale.github.io/carbondata/reference/co2_cad_trust.md)   | Climate Action Data Trust (Article 6-aligned) |
+| Function | What it returns |
+|----|----|
+| [`co2_vrod()`](https://charlescoverdale.github.io/carbondata/reference/co2_vrod.md) | Berkeley VROD (5 registries aggregated) |
+| [`co2_offsets_db()`](https://charlescoverdale.github.io/carbondata/reference/co2_offsets_db.md) | CarbonPlan OffsetsDB (REST API) |
+| [`co2_cad_trust()`](https://charlescoverdale.github.io/carbondata/reference/co2_cad_trust.md) | Climate Action Data Trust (Article 6-aligned) |
 
 ### Helpers
 
-| Function                                                                                          | What it returns                |
-|---------------------------------------------------------------------------------------------------|--------------------------------|
-| [`co2_markets()`](https://charlescoverdale.github.io/carbondata/reference/co2_markets.md)         | Directory of supported markets |
-| [`co2_clear_cache()`](https://charlescoverdale.github.io/carbondata/reference/co2_clear_cache.md) | Empty the local cache          |
-| [`co2_cache_info()`](https://charlescoverdale.github.io/carbondata/reference/co2_cache_info.md)   | Show cached files              |
+| Function | What it returns |
+|----|----|
+| [`co2_markets()`](https://charlescoverdale.github.io/carbondata/reference/co2_markets.md) | Directory of supported markets |
+| [`co2_clear_cache()`](https://charlescoverdale.github.io/carbondata/reference/co2_clear_cache.md) | Empty the local cache |
+| [`co2_cache_info()`](https://charlescoverdale.github.io/carbondata/reference/co2_cache_info.md) | Show cached files |
 
 ## Caching
 
@@ -184,12 +188,14 @@ to remove cached files.
 
 ## Related packages
 
-| Package                                                          | Description                                               |
-|------------------------------------------------------------------|-----------------------------------------------------------|
-| [carbonr](https://cran.r-project.org/package=carbonr)            | Carbon footprint calculator (activity → tCO2e conversion) |
-| [climatekit](https://github.com/charlescoverdale/climatekit)     | Climate indices (temperature, precipitation, drought)     |
-| [readnoaa](https://github.com/charlescoverdale/readnoaa)         | NOAA climate and weather data                             |
-| [inflationkit](https://github.com/charlescoverdale/inflationkit) | Inflation analysis                                        |
+| Package | Description |
+|----|----|
+| [cer](https://github.com/charlescoverdale/cer) | Australian Clean Energy Regulator (ACCUs, Safeguard, NGER) |
+| [aemo](https://github.com/charlescoverdale/aemo) | Australian Energy Market Operator (NEM prices, dispatch) |
+| [climatekit](https://github.com/charlescoverdale/climatekit) | Climate indices (temperature, precipitation, drought) |
+| [readnoaa](https://github.com/charlescoverdale/readnoaa) | NOAA climate and weather data |
+| [inflationkit](https://github.com/charlescoverdale/inflationkit) | Inflation analysis (real-terms carbon prices) |
+| [carbonr](https://cran.r-project.org/package=carbonr) | Carbon footprint calculator (activity → tCO2e conversion) |
 
 ## Issues
 
