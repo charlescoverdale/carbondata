@@ -2,7 +2,7 @@
 % Please edit documentation in R/euets.R
 \name{co2_euets_files}
 \alias{co2_euets_files}
-\title{List the EU ETS data file versions bundled with this package}
+\title{List the EU ETS data file vintages available}
 \usage{
 co2_euets_files()
 }
@@ -10,8 +10,10 @@ co2_euets_files()
 A data frame.
 }
 \description{
-Returns a data frame of the DG CLIMA file vintages supported.
-When DG CLIMA publishes a newer file, upgrade the package.
+Returns a data frame of the DG CLIMA file vintages available. The
+package scrapes the Union Registry page at runtime so new annual
+releases appear automatically; when the page is unreachable, the
+vintages bundled with the package are listed instead.
 }
 \examples{
 co2_euets_files()

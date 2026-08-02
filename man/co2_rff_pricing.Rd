@@ -4,14 +4,14 @@
 \alias{co2_rff_pricing}
 \title{RFF World Carbon Pricing Database}
 \usage{
-co2_rff_pricing(country, version = "v2026.1", refresh = FALSE)
+co2_rff_pricing(country, version = "v2025.0.0", refresh = FALSE)
 }
 \arguments{
 \item{country}{Character. Country name using underscores
 (e.g. \code{"United_Kingdom"}, \code{"Germany"}, \code{"Antigua_and_Barbuda"}).}
 
-\item{version}{Character. Dataset version folder. Default
-\code{"v2026.1"}.}
+\item{version}{Character. Git tag of the dataset release to read.
+Default \code{"v2025.0.0"}, the last openly published snapshot.}
 
 \item{refresh}{Re-download? Default \code{FALSE}.}
 }
@@ -20,9 +20,18 @@ A data frame of annual carbon prices by IPCC sector code.
 }
 \description{
 Fetches the Dolphin-Pollitt-Newbery World Carbon Pricing Database
-for one country. Covers national-level carbon pricing from 1989
-to present, with CO2 tax and ETS instruments harmonised across
-200+ jurisdictions.
+for one country: national-level carbon pricing with CO2 tax and ETS
+instruments harmonised by IPCC sector across 200+ jurisdictions.
+}
+\details{
+On 30 May 2026 the maintainer stopped distributing WCPD through
+GitHub and stripped the data files from the default branch; new
+releases moved to \url{https://worldcarbonpricing.org} behind an
+emailed download token. This function therefore reads the last
+openly published snapshot, the \code{v2025.0.0} tag, which remains
+available and covers 1990 to 2023. For newer vintages, request
+access on the WCPD site. For the companion emissions-weighted
+carbon price, which is still served openly, see \code{\link[=co2_ecp_prices]{co2_ecp_prices()}}.
 }
 \examples{
 \donttest{
@@ -39,7 +48,9 @@ Dolphin, G. G., Pollitt, M. G. and Newbery, D. M. (2020).
 }
 \seealso{
 Other aggregators: 
+\code{\link{co2_ecp_prices}()},
 \code{\link{co2_icap_prices}()},
+\code{\link{co2_icap_systems}()},
 \code{\link{co2_world_bank}()}
 }
 \concept{aggregators}

@@ -4,33 +4,46 @@
 \alias{co2_world_bank}
 \title{World Bank Carbon Pricing Dashboard}
 \usage{
-co2_world_bank(refresh = FALSE)
+co2_world_bank(path = NULL, sheet = 1L, refresh = FALSE)
 }
 \arguments{
+\item{path}{Optional path to a locally downloaded dashboard \code{.xlsx}
+file. When supplied, no network request is made.}
+
+\item{sheet}{Sheet to read. Default \code{1}. The workbook carries
+several sheets; pass a name or number to read another.}
+
 \item{refresh}{Re-download? Default \code{FALSE}.}
 }
 \value{
 A data frame.
 }
 \description{
-Fetches the World Bank Carbon Pricing Dashboard Excel file, which
-covers 70+ carbon pricing initiatives worldwide (carbon taxes +
-ETS) with price, coverage, and revenue data.
+Reads the World Bank Carbon Pricing Dashboard Excel file, which
+covers 70+ carbon pricing initiatives worldwide (carbon taxes and
+emissions trading systems) with price, coverage, and revenue data.
 }
 \details{
-The World Bank publishes a dated file every 6-12 months. This
-function scrapes the landing page to find the latest release.
+\strong{Manual download may be required.} Since 2026 the dashboard host
+rejects non-browser HTTP clients (every request returns HTTP 403,
+regardless of user agent), so this function often cannot fetch the
+file for you. When the automatic download fails it reports the
+direct file URL: download that in a browser and pass the local path
+via \code{path}. The file is republished roughly twice a year, so a
+manual copy stays current for months.
 }
 \examples{
 \donttest{
 op <- options(carbondata.cache_dir = tempdir())
-wb <- co2_world_bank()
+wb <- try(co2_world_bank(), silent = TRUE)
 options(op)
 }
 }
 \seealso{
 Other aggregators: 
+\code{\link{co2_ecp_prices}()},
 \code{\link{co2_icap_prices}()},
+\code{\link{co2_icap_systems}()},
 \code{\link{co2_rff_pricing}()}
 }
 \concept{aggregators}

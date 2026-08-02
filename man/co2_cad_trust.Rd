@@ -2,7 +2,7 @@
 % Please edit documentation in R/voluntary.R
 \name{co2_cad_trust}
 \alias{co2_cad_trust}
-\title{Climate Action Data Trust (not supported in v0.1.0)}
+\title{Climate Action Data Trust (not supported)}
 \usage{
 co2_cad_trust(...)
 }
@@ -23,9 +23,9 @@ Trust data you must either:
 }
 }
 \details{
-This function is a placeholder that errors with guidance. CAD Trust
-support is deferred to carbondata v0.2.0 once CAD Trust offers a
-stable public endpoint.
+This function is a placeholder that errors with guidance. It will
+gain an implementation once CAD Trust offers a stable public
+endpoint.
 }
 \examples{
 \dontrun{

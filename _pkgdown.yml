@@ -25,6 +25,7 @@ reference:
       - co2_rggi_allowances
       - co2_rggi_state_proceeds
       - co2_icap_prices
+      - co2_icap_systems
 
   - title: "Voluntary Markets"
     desc: "Verra, Gold Standard, ACR, CAR, and offset databases"
@@ -38,6 +39,7 @@ reference:
     contents:
       - co2_world_bank
       - co2_rff_pricing
+      - co2_ecp_prices
 
   - title: "General"
     desc: "Market index and cache"

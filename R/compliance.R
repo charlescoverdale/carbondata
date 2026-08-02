@@ -18,18 +18,31 @@
 #' options(op)
 #' }
 co2_ukets <- function(refresh = FALSE) {
-  index_url <- "https://reports.view-emissions-trading-registry.service.gov.uk/ets-reports/section4/section4.html"
-  cli_inform(c("i" = "Resolving UK ETS Section 4 compliance report URL..."))
-  hits <- co2_scrape_links(index_url,
-                           "Compliance_Report_Emissions_and_Surrenders\\.xlsx$")
+  # The registry moved this report from section 4 to section 5 during
+  # 2026 and renamed it (" and " became " & ", scheme year appended),
+  # so try both sections and match the filename loosely.
+  index_urls <- c(
+    "https://reports.view-emissions-trading-registry.service.gov.uk/ets-reports/section5/section5.html",
+    "https://reports.view-emissions-trading-registry.service.gov.uk/ets-reports/section4/section4.html"
+  )
+  cli_inform(c("i" = "Resolving UK ETS compliance report URL..."))
+  pattern <- "Compliance_Report_Emissions_(and|&|%26)_Surrenders[^/]*\\.xlsx$"
+  hits <- character(0L)
+  for (index_url in index_urls) {
+    hits <- tryCatch(co2_scrape_links(index_url, pattern),
+                     error = function(e) character(0L))
+    if (length(hits) > 0L) break
+  }
   if (length(hits) == 0L) {
     cli_abort(c(
-      "No UK ETS compliance report found on {.url {index_url}}.",
-      "i" = "The UK Emissions Trading Registry may have restructured its reports page."
+      "No UK ETS compliance report found on {.url {index_urls}}.",
+      "i" = "The UK Emissions Trading Registry may have restructured its reports page.",
+      "i" = "Please report at https://github.com/charlescoverdale/carbondata/issues."
     ))
   }
-  url <- hits[1L]
-  filename <- basename(url)
+  # Prefer the most recent scheme year when several are listed.
+  url <- co2_latest_release(hits)
+  filename <- co2_safe_filename(basename(url))
   dest <- file.path(co2_cache_dir(), filename)
   if (!file.exists(dest) || refresh) {
     cli_inform(c("i" = "Downloading {.file {filename}}..."))
@@ -37,8 +50,12 @@ co2_ukets <- function(refresh = FALSE) {
   } else {
     cli_inform(c("i" = "Loading {.file {filename}} from cache."))
   }
-  df <- readxl::read_excel(dest)
-  as.data.frame(df, stringsAsFactors = FALSE)
+  # Sheet 1 is an empty "Information" cover sheet; the table lives in
+  # the "Data" sheet.
+  sheets <- readxl::excel_sheets(dest)
+  sheet <- if ("Data" %in% sheets) "Data" else sheets[length(sheets)]
+  df <- readxl::read_excel(dest, sheet = sheet, guess_max = 1048576L)
+  co2_clean_names(as.data.frame(df, stringsAsFactors = FALSE))
 }
 
 #' UK ETS free allocations
@@ -68,17 +85,24 @@ co2_ukets_allocations <- function(sector = c("installations", "aviation"),
     aviation      = "https://www.gov.uk/government/publications/uk-ets-aviation-allocation-table"
   )
   cli_inform(c("i" = "Resolving UK ETS {sector} allocation URL..."))
+  # DESNZ dropped the month word from the filename in 2026
+  # ("...-table-march-2025.xlsx" became "...-table-2026.xlsx"), so the
+  # month segment is optional.
   pattern <- if (sector == "installations") {
-    "uk-ets-allocation-table-[a-z]+-\\d{4}\\.(xlsx|csv)$"
+    "uk-ets-allocation-table-([a-z]+-)?\\d{4}[a-z0-9-]*\\.(xlsx|csv|ods)$"
   } else {
-    "uk-ets-aviation-allocation-table-[a-z]+-\\d{4}\\.(xlsx|csv)$"
+    "uk-ets-aviation-allocation-table-([a-z]+-)?\\d{4}[a-z0-9-]*\\.(xlsx|csv|ods)$"
   }
   hits <- co2_scrape_links(page, pattern)
   if (length(hits) == 0L) {
-    cli_abort("No UK ETS {sector} allocation file found on {.url {page}}.")
+    cli_abort(c(
+      "No UK ETS {sector} allocation file found on {.url {page}}.",
+      "i" = "DESNZ may have renamed the published file.",
+      "i" = "Please report at https://github.com/charlescoverdale/carbondata/issues."
+    ))
   }
-  url <- hits[1L]
-  filename <- basename(url)
+  url <- co2_latest_release(hits)
+  filename <- co2_safe_filename(basename(url))
   dest <- file.path(co2_cache_dir(), filename)
   if (!file.exists(dest) || refresh) {
     cli_inform(c("i" = "Downloading {.file {filename}}..."))
@@ -90,9 +114,10 @@ co2_ukets_allocations <- function(sector = c("installations", "aviation"),
   df <- if (ext == "csv") {
     utils::read.csv(dest, stringsAsFactors = FALSE, check.names = FALSE)
   } else {
-    as.data.frame(readxl::read_excel(dest), stringsAsFactors = FALSE)
+    as.data.frame(readxl::read_excel(dest, guess_max = 1048576L),
+                  stringsAsFactors = FALSE)
   }
-  df
+  co2_clean_names(df)
 }
 
 #' RGGI allowance distribution by state and year
@@ -136,7 +161,7 @@ co2_rggi_allowances <- function(year = NULL, refresh = FALSE) {
     cli_inform(c("i" = "Loading {.file {filename}} from cache."))
   }
   df <- readxl::read_excel(dest)
-  as.data.frame(df, stringsAsFactors = FALSE)
+  co2_clean_names(as.data.frame(df, stringsAsFactors = FALSE))
 }
 
 #' RGGI cumulative state proceeds by auction
@@ -179,7 +204,7 @@ co2_rggi_state_proceeds <- function(state, refresh = FALSE) {
     cli_inform(c("i" = "Loading {.file {filename}} from cache."))
   }
   df <- readxl::read_excel(dest)
-  out <- as.data.frame(df, stringsAsFactors = FALSE)
+  out <- co2_clean_names(as.data.frame(df, stringsAsFactors = FALSE))
   out$state <- state
   out
 }

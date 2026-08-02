@@ -11,6 +11,7 @@ Unified access to carbon market data from compliance emissions trading systems (
 \seealso{
 Useful links:
 \itemize{
+  \item \url{https://charlescoverdale.github.io/carbondata/}
   \item \url{https://github.com/charlescoverdale/carbondata}
   \item Report bugs at \url{https://github.com/charlescoverdale/carbondata/issues}
 }

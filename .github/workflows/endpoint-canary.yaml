@@ -1,0 +1,52 @@
+on:
+  schedule:
+    # 06:15 UTC every Monday
+    - cron: "15 6 * * 1"
+  workflow_dispatch:
+
+name: endpoint-canary
+
+# carbondata's value is entirely in tracking upstream URLs that move
+# without notice. This job exercises every live data source weekly and
+# opens an issue when one breaks, so breakage is found here rather than
+# by a user mid-analysis.
+jobs:
+  canary:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+      CARBONDATA_LIVE_TESTS: "1"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::testthat, any::arrow, local::.
+
+      - name: Probe every live endpoint
+        id: probe
+        run: Rscript inst/canary/check-endpoints.R
+        continue-on-error: true
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: endpoint-report
+          path: endpoint-report.md
+
+      - name: Open an issue on failure
+        if: steps.probe.outcome == 'failure'
+        uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: "Endpoint canary failed"
+          content-filepath: endpoint-report.md
+          labels: |
+            upstream-breakage
+            automated

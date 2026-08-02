@@ -38,15 +38,17 @@ co2_validate_date <- function(x, arg = "date") {
   format(d, "%Y-%m-%d")
 }
 
-# Build a standard httr2 request with Mozilla User-Agent (required by some
-# EC servers like climate.ec.europa.eu which return 429 to bare curl UA),
-# retry behaviour, and modest throttling.
+# Some EC servers (climate.ec.europa.eu) return 429 to a bare curl UA.
+.co2_user_agent <- paste0(
+  "Mozilla/5.0 (compatible; carbondata R package; ",
+  "https://github.com/charlescoverdale/carbondata)"
+)
+
+# Build a standard httr2 request with the package User-Agent, retry
+# behaviour, and modest throttling.
 co2_request <- function(url) {
   req <- httr2::request(url)
-  req <- httr2::req_user_agent(
-    req,
-    "Mozilla/5.0 (compatible; carbondata R package; https://github.com/charlescoverdale/carbondata)"
-  )
+  req <- httr2::req_user_agent(req, .co2_user_agent)
   req <- httr2::req_retry(
     req,
     max_tries = 3L,
@@ -59,14 +61,27 @@ co2_request <- function(url) {
   req
 }
 
-# Download a URL to a file with caching
-co2_download <- function(url, dest, refresh = FALSE) {
+# Download a URL to a file with caching. `max_age_days` re-downloads a
+# cached file older than the given age; use for sources that update in
+# place under a stable filename (EEX current-year report, ICAP JSON).
+co2_download <- function(url, dest, refresh = FALSE, max_age_days = Inf) {
   if (file.exists(dest) && !refresh) {
-    return(dest)
+    age_days <- as.numeric(difftime(Sys.time(), file.mtime(dest), units = "days"))
+    if (age_days <= max_age_days) {
+      return(dest)
+    }
+    cli_inform(c("i" = "Cached copy is {round(age_days, 1)} days old; re-downloading."))
   }
+  # Download to a temporary file and move it into place only on
+  # success. httr2 writes the response body to `path` before it raises
+  # on an HTTP error, so writing straight to `dest` leaves the error
+  # page sitting in the cache, and every later call serves that instead
+  # of re-fetching.
+  tmp <- paste0(dest, ".part")
+  on.exit(unlink(tmp), add = TRUE)
   req <- co2_request(url)
   resp <- tryCatch(
-    httr2::req_perform(req, path = dest),
+    httr2::req_perform(req, path = tmp),
     error = function(e) {
       cli_abort(c(
         "Failed to download {.url {url}}.",
@@ -79,6 +94,12 @@ co2_download <- function(url, dest, refresh = FALSE) {
   status <- httr2::resp_status(resp)
   if (status >= 400L) {
     cli_abort("Download failed with HTTP {status}: {.url {url}}")
+  }
+  if (!file.rename(tmp, dest)) {
+    # rename fails across filesystems; fall back to a copy.
+    if (!file.copy(tmp, dest, overwrite = TRUE)) {
+      cli_abort("Could not write downloaded file to {.file {dest}}.")
+    }
   }
   dest
 }
@@ -103,6 +124,7 @@ co2_scrape_links <- function(page_url, pattern) {
   html <- httr2::resp_body_string(resp)
   hrefs <- regmatches(html, gregexpr('href="[^"]+"', html))[[1L]]
   hrefs <- gsub('^href="|"$', "", hrefs)
+  hrefs <- gsub("&amp;", "&", hrefs, fixed = TRUE)
   hits <- grep(pattern, hrefs, value = TRUE)
   # Resolve relative URLs
   base_url <- sub("(https?://[^/]+).*", "\\1", page_url)
@@ -127,6 +149,46 @@ co2_list_to_df <- function(items) {
   as.data.frame(cols_data, stringsAsFactors = FALSE)
 }
 
+# Pick the newest release from a set of date-stamped download URLs.
+# Plain lexical sorting is wrong whenever a publisher mixes numbering
+# schemes: Berkeley's VROD archive holds both "v4-2021-year-end" and
+# "v2026-06", and "v4" sorts above "v2026". Rank by the date embedded
+# in the filename instead, falling back to lexical order for names
+# carrying no parseable date.
+co2_latest_release <- function(urls) {
+  if (length(urls) == 0L) return(character(0L))
+  score <- vapply(basename(urls), function(f) {
+    ym <- regmatches(f, regexpr("(19|20)\\d{2}[-_]\\d{2}([-_]\\d{2})?", f))
+    if (length(ym) == 1L) {
+      parts <- as.integer(strsplit(gsub("[-_]", " ", ym), " ")[[1L]])
+      parts <- c(parts, rep(1L, 3L - length(parts)))
+      return(parts[1L] * 10000 + parts[2L] * 100 + parts[3L])
+    }
+    y <- regmatches(f, regexpr("(19|20)\\d{2}", f))
+    if (length(y) == 1L) return(as.integer(y) * 10000)
+    NA_real_
+  }, numeric(1L))
+  if (all(is.na(score))) return(sort(urls, decreasing = TRUE)[1L])
+  urls[order(score, urls, decreasing = TRUE, na.last = TRUE)][1L]
+}
+
+# Collapse whitespace inside column names. Spreadsheet headers that
+# wrap across lines carry the line break into the name, so VROD ships
+# columns literally called "Total Credits \r\nIssued". Nobody can guess
+# that, and it makes every reference to the column unreadable.
+co2_clean_names <- function(df) {
+  names(df) <- trimws(gsub("[[:space:]]+", " ", names(df)))
+  df
+}
+
+# Make a published filename safe to use as a cache filename. Publishers
+# put characters like "&" in filenames (UK ETS compliance report).
+co2_safe_filename <- function(x) {
+  x <- utils::URLdecode(x)
+  x <- gsub("[^A-Za-z0-9._-]+", "_", x)
+  gsub("_{2,}", "_", x)
+}
+
 # Format bytes as human-readable string
 co2_format_bytes <- function(x) {
   if (is.na(x) || x < 1024) return(paste0(x, " B"))
@@ -139,8 +201,11 @@ co2_format_bytes <- function(x) {
   }
 }
 
-# Case-insensitive column picker for messy published datasets
-co2_pick <- function(df, patterns, default = NA_character_) {
+# Case-insensitive column picker for messy published datasets.
+# `required = TRUE` aborts (instead of silently filling the default) when
+# no pattern matches: silent NA identifier columns turn downstream filters
+# into empty results with no explanation.
+co2_pick <- function(df, patterns, default = NA_character_, required = FALSE) {
   n <- names(df)
   for (p in patterns) {
     hit <- n[tolower(n) == tolower(p)]
@@ -148,5 +213,34 @@ co2_pick <- function(df, patterns, default = NA_character_) {
     hit <- n[grepl(p, n, ignore.case = TRUE)]
     if (length(hit) > 0L) return(df[[hit[1L]]])
   }
+  if (required) {
+    cli_abort(c(
+      "Expected a column matching {.val {patterns}} but found none.",
+      "i" = "Columns present: {.val {utils::head(n, 20)}}.",
+      "i" = "The publisher may have changed the file layout; please report at",
+      " " = "https://github.com/charlescoverdale/carbondata/issues."
+    ))
+  }
   rep(default, nrow(df))
+}
+
+# Locate the header row in a spreadsheet whose publisher prepends banner
+# rows above the real header. Returns the number of rows to skip so that
+# the row containing `marker` becomes the header row.
+co2_find_header_row <- function(path, marker, sheet = 1L, max_rows = 60L) {
+  raw <- suppressMessages(
+    readxl::read_excel(path, sheet = sheet, col_names = FALSE,
+                       n_max = max_rows, col_types = "text")
+  )
+  for (i in seq_len(nrow(raw))) {
+    vals <- as.character(unlist(raw[i, ]))
+    if (any(grepl(marker, vals, ignore.case = TRUE), na.rm = TRUE)) {
+      return(i - 1L)
+    }
+  }
+  cli_abort(c(
+    "Could not find a header row containing {.val {marker}} in {.file {basename(path)}}.",
+    "i" = "The publisher may have changed the file layout; please report at",
+    " " = "https://github.com/charlescoverdale/carbondata/issues."
+  ))
 }

@@ -1,6 +1,6 @@
 Package: carbondata
 Title: Access Carbon Market Data from Emissions Trading Systems and Voluntary Registries
-Version: 0.1.1
+Version: 0.2.0
 Authors@R:
     person("Charles", "Coverdale", , "charlesfcoverdale@gmail.com", role = c("aut", "cre"))
 Description: Unified access to carbon market data from compliance
@@ -32,7 +32,8 @@ Imports:
 Suggests:
     arrow,
     nanoparquet,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    writexl
 Config/testthat/edition: 3
 URL: https://charlescoverdale.github.io/carbondata/, https://github.com/charlescoverdale/carbondata
 BugReports: https://github.com/charlescoverdale/carbondata/issues

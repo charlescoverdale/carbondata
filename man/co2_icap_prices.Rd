@@ -4,13 +4,24 @@
 \alias{co2_icap_prices}
 \title{ICAP Allowance Price Explorer}
 \usage{
-co2_icap_prices(jurisdiction = NULL, refresh = FALSE)
+co2_icap_prices(jurisdiction = NULL, include_download = FALSE, refresh = FALSE)
 }
 \arguments{
 \item{jurisdiction}{Optional character vector. Filter by
-jurisdiction name (e.g. \code{c("Regional Greenhouse Gas Initiative", "EU ETS")}). When \code{NULL}, returns all.}
+jurisdiction name. Matching is case-insensitive and partial, so
+\code{"EU ETS"} matches
+\code{"European Union Emissions Trading System (from 2019)"}. When
+\code{NULL}, returns all. Use \code{\link[=co2_icap_systems]{co2_icap_systems()}} to list the exact
+names.}
 
-\item{refresh}{Re-download? Default \code{FALSE}.}
+\item{include_download}{Logical. ICAP publishes a second "(download)"
+copy of several systems carrying the same prices as the main
+series. These are excluded by default, because including them
+duplicates a system in any chart or average. Set \code{TRUE} to keep
+them.}
+
+\item{refresh}{Re-download? Default \code{FALSE}. The cached copy is
+refreshed automatically when it is more than a day old.}
 }
 \value{
 A data frame with \code{date}, \code{jurisdiction}, \code{market_type}
@@ -32,6 +43,8 @@ options(op)
 }
 \seealso{
 Other aggregators: 
+\code{\link{co2_ecp_prices}()},
+\code{\link{co2_icap_systems}()},
 \code{\link{co2_rff_pricing}()},
 \code{\link{co2_world_bank}()}
 }

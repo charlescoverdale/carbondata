@@ -2,7 +2,7 @@
 % Please edit documentation in R/euets.R
 \name{co2_euets_installations}
 \alias{co2_euets_installations}
-\title{EU ETS installation registry}
+\title{EU ETS installation registry (historical 2012 snapshot)}
 \usage{
 co2_euets_installations(country = NULL, refresh = FALSE)
 }
@@ -16,8 +16,15 @@ A data frame.
 }
 \description{
 Returns the registry of stationary EU ETS installations with
-operator name, activity type, country, city, and permit details.
-Sourced from the DG CLIMA Union Registry snapshot.
+operator name, activity type, country, and permit details.
+}
+\details{
+\strong{Vintage warning}: the only bulk installation registry DG CLIMA
+publishes is a Union Registry snapshot dated 28 August 2012 (Phase
+2). It predates every installation added since, and permit statuses
+have not been updated. For current installation-level detail, use
+the identifier columns returned by \code{\link[=co2_euets_emissions]{co2_euets_emissions()}}, which
+come from the latest annual verified-emissions file.
 }
 \examples{
 \donttest{

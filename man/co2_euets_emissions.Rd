@@ -8,6 +8,7 @@ co2_euets_emissions(
   country = NULL,
   year = NULL,
   file_year = NULL,
+  scheme = c("ets1", "ets2", "all"),
   refresh = FALSE
 )
 }
@@ -24,11 +25,21 @@ emissions data covers calendar years up to publication year -1.}
 Default is the latest year available in the package (see
 \code{\link[=co2_euets_files]{co2_euets_files()}}).}
 
+\item{scheme}{Which trading system to return. \code{"ets1"} (default) is
+the original EU ETS: power, industry, and aviation installations.
+\code{"ets2"} is the separate buildings, road transport, and small
+industry system that began reporting for compliance year 2024,
+which DG CLIMA publishes in the same file as one aggregate account
+per member state. \code{"all"} returns both, and is rarely what you
+want: the two are different systems on different accounting bases,
+so summing them together double-counts (ETS2 accounts added 981 Mt
+to the 2024 file, about 45\% of the reported total).}
+
 \item{refresh}{Logical. Re-download? Default \code{FALSE}.}
 }
 \value{
 A data frame with columns \code{country}, \code{installation_id},
-\code{installation_name}, \code{activity}, \code{year},
+\code{installation_name}, \code{activity}, \code{scheme}, \code{year},
 \code{verified_emissions_tco2e}, \code{allocation_eua}.
 }
 \description{
@@ -40,10 +51,10 @@ and linked Swiss ETS. Emissions data from 2005 onwards; annual
 files published each April for the prior compliance year.
 }
 \examples{
-\dontrun{
-# DG CLIMA file schema drifted in 2026; parser needs updating.
-# Tracked at https://github.com/charlescoverdale/carbondata/issues
+\donttest{
+op <- options(carbondata.cache_dir = tempdir())
 de <- co2_euets_emissions(country = "DE")
+options(op)
 }
 }
 \seealso{
