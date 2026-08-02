@@ -13,9 +13,9 @@ ETS allowances, prices, and allocation data
 - [`co2_euets_surrendered()`](https://charlescoverdale.github.io/carbondata/reference/co2_euets_surrendered.md)
   : EU ETS compliance status and cumulative surrendered units
 - [`co2_euets_installations()`](https://charlescoverdale.github.io/carbondata/reference/co2_euets_installations.md)
-  : EU ETS installation registry
+  : EU ETS installation registry (historical 2012 snapshot)
 - [`co2_euets_files()`](https://charlescoverdale.github.io/carbondata/reference/co2_euets_files.md)
-  : List the EU ETS data file versions bundled with this package
+  : List the EU ETS data file vintages available
 - [`co2_ukets()`](https://charlescoverdale.github.io/carbondata/reference/co2_ukets.md)
   : UK ETS verified emissions and surrenders
 - [`co2_ukets_allocations()`](https://charlescoverdale.github.io/carbondata/reference/co2_ukets_allocations.md)
@@ -30,6 +30,8 @@ ETS allowances, prices, and allocation data
   : RGGI cumulative state proceeds by auction
 - [`co2_icap_prices()`](https://charlescoverdale.github.io/carbondata/reference/co2_icap_prices.md)
   : ICAP Allowance Price Explorer
+- [`co2_icap_systems()`](https://charlescoverdale.github.io/carbondata/reference/co2_icap_systems.md)
+  : ICAP systems available
 
 ## Voluntary Markets
 
@@ -40,7 +42,7 @@ Verra, Gold Standard, ACR, CAR, and offset databases
 - [`co2_offsets_db()`](https://charlescoverdale.github.io/carbondata/reference/co2_offsets_db.md)
   : CarbonPlan OffsetsDB (via S3 parquet)
 - [`co2_cad_trust()`](https://charlescoverdale.github.io/carbondata/reference/co2_cad_trust.md)
-  : Climate Action Data Trust (not supported in v0.1.0)
+  : Climate Action Data Trust (not supported)
 
 ## Policy and Pricing
 
@@ -50,6 +52,8 @@ World Bank and RFF carbon pricing data
   : World Bank Carbon Pricing Dashboard
 - [`co2_rff_pricing()`](https://charlescoverdale.github.io/carbondata/reference/co2_rff_pricing.md)
   : RFF World Carbon Pricing Database
+- [`co2_ecp_prices()`](https://charlescoverdale.github.io/carbondata/reference/co2_ecp_prices.md)
+  : Emissions-weighted carbon prices (ECP)
 
 ## General
 

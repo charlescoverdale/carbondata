@@ -42,12 +42,7 @@ Other compliance markets:
 op <- options(carbondata.cache_dir = tempdir())
 alloc <- co2_ukets_allocations()
 #> ℹ Resolving UK ETS installations allocation URL...
-#> ℹ Downloading uk-ets-allocation-table-april-2026.xlsx...
-#> New names:
-#> • `` -> `...1`
-#> • `` -> `...2`
-#> • `` -> `...3`
-#> • `` -> `...4`
+#> ℹ Downloading uk-ets-allocation-table-2026.xlsx...
 options(op)
 # }
 ```

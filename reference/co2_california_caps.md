@@ -35,6 +35,7 @@ Other compliance markets:
 op <- options(carbondata.cache_dir = tempdir())
 caps <- co2_california_caps()
 #> ℹ Downloading California overall caps...
+#> Error in read.table(file = file, header = header, sep = sep, quote = quote,     dec = dec, fill = fill, comment.char = comment.char, ...): no lines available in input
 options(op)
 # }
 ```

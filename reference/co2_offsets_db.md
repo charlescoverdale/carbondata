@@ -8,7 +8,12 @@ Climate Action Reserve.
 ## Usage
 
 ``` r
-co2_offsets_db(kind = c("projects", "credits"), date = NULL, refresh = FALSE)
+co2_offsets_db(
+  kind = c("projects", "credits"),
+  date = NULL,
+  max_lookback = 180L,
+  refresh = FALSE
+)
 ```
 
 ## Arguments
@@ -19,10 +24,15 @@ co2_offsets_db(kind = c("projects", "credits"), date = NULL, refresh = FALSE)
 
 - date:
 
-  Optional character. ISO date of the snapshot to fetch (must be a day
-  CarbonPlan published; the function walks backwards from this date up
-  to 7 days). Default
+  Optional character. ISO date of the snapshot to fetch. The function
+  walks backwards from this date to find a published snapshot. Default
   [`Sys.Date()`](https://rdrr.io/r/base/Sys.time.html).
+
+- max_lookback:
+
+  Integer. How many days to walk back before giving up. Default 180,
+  because CarbonPlan's publication cadence became irregular during 2026
+  and the last snapshot seen was 1 June 2026.
 
 - refresh:
 
@@ -52,7 +62,9 @@ Other voluntary markets:
 # \donttest{
 op <- options(carbondata.cache_dir = tempdir())
 path <- co2_offsets_db("projects")
-#> ℹ Downloading OffsetsDB projects snapshot from 2026-04-29...
+#> Warning: ! Newest OffsetsDB snapshot is 62 days old (2026-06-01).
+#> ℹ CarbonPlan's publication cadence became irregular in 2026.
+#> ℹ Downloading OffsetsDB projects snapshot from 2026-06-01...
 if (requireNamespace("arrow", quietly = TRUE)) {
   df <- arrow::read_parquet(path)
 }

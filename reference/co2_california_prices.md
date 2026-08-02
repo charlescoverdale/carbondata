@@ -36,6 +36,7 @@ Other compliance markets:
 op <- options(carbondata.cache_dir = tempdir())
 prices <- co2_california_prices()
 #> ℹ Downloading California Cap-and-Trade auction prices...
+#> Error in read.table(file = file, header = header, sep = sep, quote = quote,     dec = dec, fill = fill, comment.char = comment.char, ...): no lines available in input
 options(op)
 # }
 ```

@@ -14,6 +14,7 @@ co2_euets_emissions(
   country = NULL,
   year = NULL,
   file_year = NULL,
+  scheme = c("ets1", "ets2", "all"),
   refresh = FALSE
 )
 ```
@@ -38,6 +39,18 @@ co2_euets_emissions(
   year available in the package (see
   [`co2_euets_files()`](https://charlescoverdale.github.io/carbondata/reference/co2_euets_files.md)).
 
+- scheme:
+
+  Which trading system to return. `"ets1"` (default) is the original EU
+  ETS: power, industry, and aviation installations. `"ets2"` is the
+  separate buildings, road transport, and small industry system that
+  began reporting for compliance year 2024, which DG CLIMA publishes in
+  the same file as one aggregate account per member state. `"all"`
+  returns both, and is rarely what you want: the two are different
+  systems on different accounting bases, so summing them together
+  double-counts (ETS2 accounts added 981 Mt to the 2024 file, about 45%
+  of the reported total).
+
 - refresh:
 
   Logical. Re-download? Default `FALSE`.
@@ -45,8 +58,8 @@ co2_euets_emissions(
 ## Value
 
 A data frame with columns `country`, `installation_id`,
-`installation_name`, `activity`, `year`, `verified_emissions_tco2e`,
-`allocation_eua`.
+`installation_name`, `activity`, `scheme`, `year`,
+`verified_emissions_tco2e`, `allocation_eua`.
 
 ## See also
 
@@ -60,9 +73,10 @@ Other EU ETS:
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-# DG CLIMA file schema drifted in 2026; parser needs updating.
-# Tracked at https://github.com/charlescoverdale/carbondata/issues
+# \donttest{
+op <- options(carbondata.cache_dir = tempdir())
 de <- co2_euets_emissions(country = "DE")
-} # }
+#> ℹ Loading verified_emissions_2025_en.xlsx from cache.
+options(op)
+# }
 ```

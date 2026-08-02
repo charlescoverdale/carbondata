@@ -1,4 +1,4 @@
-# Climate Action Data Trust (not supported in v0.1.0)
+# Climate Action Data Trust (not supported)
 
 CAD Trust is the Chia-Network "cadt" software designed to be
 self-hosted. There is no unauthenticated public API. To use CAD Trust
@@ -27,9 +27,8 @@ Never returns (always errors).
 
 ## Details
 
-This function is a placeholder that errors with guidance. CAD Trust
-support is deferred to carbondata v0.2.0 once CAD Trust offers a stable
-public endpoint.
+This function is a placeholder that errors with guidance. It will gain
+an implementation once CAD Trust offers a stable public endpoint.
 
 ## See also
 

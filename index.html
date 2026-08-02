@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Access Carbon Market Data from Emissions Trading Systems and Voluntary Registries • carbondata</title>
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Access Carbon Market Data from Emissions Trading Systems and Voluntary Registries">
 <meta name="description" content="Unified access to carbon market data from compliance emissions trading systems (EU ETS, UK ETS, RGGI, California Cap-and-Trade) and voluntary carbon markets (Verra, Gold Standard, American Carbon Registry, Climate Action Reserve, via the Berkeley Voluntary Registry Offsets Database and the CarbonPlan OffsetsDB API). Includes cross-market price data from the International Carbon Action Partnership (ICAP) Allowance Price Explorer &lt;https://icapcarbonaction.com/en/ets-prices&gt;, global carbon pricing from the World Bank Carbon Pricing Dashboard &lt;https://carbonpricingdashboard.worldbank.org/&gt;, and the historical RFF World Carbon Pricing Database following Dolphin, Pollitt and Newbery (2020) &lt;doi:10.1038/s41597-022-01659-x&gt;. Data is downloaded from public sources on first use and cached locally.">
@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">carbondata</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,7 +55,7 @@
 <div class="section level2">
 <h2 id="carbon-markets-now-price-12-billion-tonnes-a-year-the-data-is-a-mess">Carbon markets now price 12 billion tonnes a year. The data is a mess.<a class="anchor" aria-label="anchor" href="#carbon-markets-now-price-12-billion-tonnes-a-year-the-data-is-a-mess"></a>
 </h2>
-<p>Carbon pricing has gone from a niche instrument to a systemic part of global climate policy. Around 12 billion tonnes of CO2-equivalent are now covered by some form of carbon price, about 24% of global emissions. The EU ETS alone prices ~40% of EU emissions and generates roughly EUR 40 billion a year in auction revenue. Voluntary carbon markets have issued over 2 billion credits since 1996, and Article 6 of the Paris Agreement is bringing a new wave of international carbon trading online.</p>
+<p>Carbon pricing has gone from a niche instrument to a systemic part of global climate policy. Around 12 billion tonnes of CO2-equivalent are now covered by some form of carbon price, about a quarter of global emissions. On the data this package returns, EU ETS primary auctions raised EUR 43.2bn across 213 auctions in 2025 at a mean settlement price of EUR 73.45, the EU ETS covered 1.19 billion tonnes of verified emissions in 2024, and the voluntary registries have issued 2.65 billion credits since 1996. Article 6 of the Paris Agreement is bringing a further wave of international carbon trading online.</p>
 <p>The catch is that the data is scattered across dozens of jurisdictions, agencies, and registries, each with its own format, access pattern, and quirks:</p>
 <ul>
 <li>
@@ -72,11 +72,11 @@
 <li>
 <strong>World Bank Carbon Pricing Dashboard</strong> publishes an XLSX twice a year, with a filename that encodes the release date</li>
 <li>
-<strong>RFF World Carbon Pricing Database</strong> lives on GitHub as per-country CSVs in version-stamped folders</li>
+<strong>RFF World Carbon Pricing Database</strong> published per-country CSVs on GitHub until May 2026, and now serves current data through its own API</li>
 <li>
 <strong>Berkeley VROD</strong> aggregates five voluntary registries into a bimonthly XLSX release</li>
 <li>
-<strong>CarbonPlan OffsetsDB</strong> maintains daily parquet snapshots of voluntary credits in a public S3 bucket (the REST API was deprecated in 2026)</li>
+<strong>CarbonPlan OffsetsDB</strong> publishes parquet snapshots of voluntary credits to a public S3 bucket (the REST API was deprecated in 2026, and daily publishing stopped mid-2026)</li>
 </ul>
 <p><code>carbondata</code> wraps the stable, free, API-accessible sources through a consistent R interface, handling URL resolution, caching, and schema normalisation so you can get on with the analysis.</p>
 </div>
@@ -130,7 +130,11 @@
 </tr>
 <tr>
 <td><strong>RFF World Carbon Pricing Database</strong></td>
-<td>Subnational historical coverage 1990-2020 (Dolphin, Pollitt, Newbery 2020)</td>
+<td>National historical coverage to 2023 (Dolphin, Pollitt, Newbery 2020)</td>
+</tr>
+<tr>
+<td><strong>Emissions-weighted carbon price (ECP)</strong></td>
+<td>Effective carbon prices and coverage by jurisdiction, sector, and region</td>
 </tr>
 <tr>
 <td><strong>Berkeley VROD</strong></td>
@@ -138,15 +142,11 @@
 </tr>
 <tr>
 <td><strong>CarbonPlan OffsetsDB</strong></td>
-<td>Voluntary market aggregator with REST API</td>
-</tr>
-<tr>
-<td><strong>Climate Action Data Trust</strong></td>
-<td>Article 6-aligned harmonised registry API</td>
+<td>Voluntary market aggregator, parquet snapshots</td>
 </tr>
 </tbody>
 </table>
-<p>All sources are free. None require registration for v0.1.0 functionality.</p>
+<p>All sources are free. Two need extra steps: the World Bank dashboard blocks programmatic clients, so <code><a href="reference/co2_world_bank.html">co2_world_bank()</a></code> takes a manually downloaded file, and full World Carbon Pricing Database downloads now need a token requested from the publisher (the derived ECP data behind <code><a href="reference/co2_ecp_prices.html">co2_ecp_prices()</a></code> stays open).</p>
 </div>
 <div class="section level2">
 <h2 id="quick-start">Quick start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
@@ -161,45 +161,57 @@
 <span><span class="va">prices</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/co2_euets_price.html">co2_euets_price</a></span><span class="op">(</span>from <span class="op">=</span> <span class="st">"2024-01-01"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">prices</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Verified emissions for large German installations, 2022</span></span>
+<span><span class="co"># Verified emissions for German installations, 2022</span></span>
 <span><span class="va">emissions</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/co2_euets_emissions.html">co2_euets_emissions</a></span><span class="op">(</span>country <span class="op">=</span> <span class="st">"DE"</span>, year <span class="op">=</span> <span class="fl">2022</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Cross-market price comparison</span></span>
 <span><span class="va">icap</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/co2_icap_prices.html">co2_icap_prices</a></span><span class="op">(</span>jurisdiction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"EU ETS"</span>, <span class="st">"UK ETS"</span>, <span class="st">"RGGI"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Voluntary forestry projects registered with Verra</span></span>
-<span><span class="va">verra_forestry</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/co2_vrod.html">co2_vrod</a></span><span class="op">(</span>registry <span class="op">=</span> <span class="st">"Verra"</span>, project_type <span class="op">=</span> <span class="st">"Forestry"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># Voluntary offset projects across five registries</span></span>
+<span><span class="va">vrod</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/co2_vrod.html">co2_vrod</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="example-the-cross-market-price-chart">Example: the cross-market price chart<a class="anchor" aria-label="anchor" href="#example-the-cross-market-price-chart"></a>
 </h2>
-<p>One chart, four compliance markets, 20 years of data.</p>
+<p>One chart, four compliance markets, two decades of data.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://charlescoverdale.github.io/carbondata/">carbondata</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">icap</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/co2_icap_prices.html">co2_icap_prices</a></span><span class="op">(</span></span>
-<span>  jurisdiction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"EU ETS"</span>, <span class="st">"UK ETS"</span>, <span class="st">"RGGI"</span>, <span class="st">"California"</span><span class="op">)</span>,</span>
-<span>  from <span class="op">=</span> <span class="st">"2005-01-01"</span></span>
+<span>  jurisdiction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"EU ETS"</span>, <span class="st">"UK ETS"</span>, <span class="st">"RGGI"</span>, <span class="st">"California"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">icap</span><span class="op">$</span><span class="va">date</span>, <span class="va">icap</span><span class="op">$</span><span class="va">price_usd</span>, col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">icap</span><span class="op">$</span><span class="va">jurisdiction</span><span class="op">)</span>,</span>
-<span>     xlab <span class="op">=</span> <span class="st">""</span>, ylab <span class="op">=</span> <span class="st">"USD / tCO2e"</span>, pch <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">icap</span><span class="op">$</span><span class="va">date</span>, <span class="va">icap</span><span class="op">$</span><span class="va">price</span>, col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">icap</span><span class="op">$</span><span class="va">jurisdiction</span><span class="op">)</span>,</span>
+<span>     xlab <span class="op">=</span> <span class="st">""</span>, ylab <span class="op">=</span> <span class="st">"Price per tCO2e (local currency)"</span>, pch <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"topleft"</span>, legend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">icap</span><span class="op">$</span><span class="va">jurisdiction</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>       col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nlevels.html" class="external-link">nlevels</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">icap</span><span class="op">$</span><span class="va">jurisdiction</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, pch <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span></code></pre></div>
+<p>Short names such as <code>"EU ETS"</code> and <code>"RGGI"</code> resolve to the full names ICAP uses. Call <code><a href="reference/co2_icap_systems.html">co2_icap_systems()</a></code> to see every system with its date range.</p>
 </div>
 <div class="section level2">
 <h2 id="example-voluntary-vs-compliance-divergence">Example: voluntary vs compliance divergence<a class="anchor" aria-label="anchor" href="#example-voluntary-vs-compliance-divergence"></a>
 </h2>
-<p>Compliance markets (EU ETS) trade around USD 70/tCO2. Nature-based voluntary credits trade around USD 5/tCO2. Why the gap?</p>
+<p>Compliance allowances trade far above nature-based voluntary credits. The two datasets make the gap easy to quantify.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># EU ETS average 2024 price</span></span>
+<code class="sourceCode R"><span><span class="co"># EU ETS average auction price, 2024</span></span>
 <span><span class="va">eu</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/co2_euets_price.html">co2_euets_price</a></span><span class="op">(</span>from <span class="op">=</span> <span class="st">"2024-01-01"</span>, to <span class="op">=</span> <span class="st">"2024-12-31"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">eu</span><span class="op">$</span><span class="va">price_eur</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] ~65</span></span>
 <span></span>
-<span><span class="co"># Average Verra credit issuance across forestry projects</span></span>
-<span><span class="va">vrod</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/co2_vrod.html">co2_vrod</a></span><span class="op">(</span>registry <span class="op">=</span> <span class="st">"Verra"</span>, project_type <span class="op">=</span> <span class="st">"Forestry"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">vrod</span><span class="op">$</span><span class="va">total_issuances</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># Issuances across Verra forestry projects</span></span>
+<span><span class="va">vrod</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/co2_vrod.html">co2_vrod</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">forestry</span> <span class="op">&lt;-</span> <span class="va">vrod</span><span class="op">[</span><span class="va">vrod</span><span class="op">$</span><span class="va">`Voluntary Registry`</span> <span class="op">==</span> <span class="st">"VCS"</span> <span class="op">&amp;</span></span>
+<span>                   <span class="va">vrod</span><span class="op">$</span><span class="va">Scope</span> <span class="op">==</span> <span class="st">"Forestry &amp; Land Use"</span>, <span class="op">]</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">forestry</span><span class="op">$</span><span class="va">`Total Credits Issued`</span><span class="op">)</span></span></code></pre></div>
+<p>Registry codes are <code>VCS</code> (Verra), <code>GOLD</code>, <code>ACR</code>, <code>CAR</code>, <code>ART</code>, and <code>ISO</code>. Column names come straight from the workbook, with wrapped headers flattened: the sheet stores one column as <code>"Total Credits \r\nIssued"</code>, which <code>carbondata</code> normalises to <code>"Total Credits Issued"</code>.</p>
+</div>
+<div class="section level2">
+<h2 id="a-trap-worth-knowing-about-eu-ets2">A trap worth knowing about: EU ETS2<a class="anchor" aria-label="anchor" href="#a-trap-worth-knowing-about-eu-ets2"></a>
+</h2>
+<p>From compliance year 2024, DG CLIMA publishes the new EU ETS2 (buildings, road transport, small industry) in the <em>same file</em> as the original ETS1 installations, as one aggregate account per member state. Those 25 accounts added 981 Mt to the 2024 file, about 45% of the reported total, so summing the file as published roughly doubles country totals.</p>
+<p><code>carbondata</code> separates them. The default is ETS1, which is what “EU ETS” has always meant:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/co2_euets_emissions.html">co2_euets_emissions</a></span><span class="op">(</span>country <span class="op">=</span> <span class="st">"DE"</span>, year <span class="op">=</span> <span class="fl">2024</span><span class="op">)</span>                   <span class="co"># ETS1 only</span></span>
+<span><span class="fu"><a href="reference/co2_euets_emissions.html">co2_euets_emissions</a></span><span class="op">(</span>country <span class="op">=</span> <span class="st">"DE"</span>, year <span class="op">=</span> <span class="fl">2024</span>, scheme <span class="op">=</span> <span class="st">"ets2"</span><span class="op">)</span>  <span class="co"># ETS2 accounts</span></span>
+<span><span class="fu"><a href="reference/co2_euets_emissions.html">co2_euets_emissions</a></span><span class="op">(</span>country <span class="op">=</span> <span class="st">"DE"</span>, year <span class="op">=</span> <span class="fl">2024</span>, scheme <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span>   <span class="co"># both, do not sum</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="functions">Functions<a class="anchor" aria-label="anchor" href="#functions"></a>
@@ -235,7 +247,11 @@
 </tr>
 <tr>
 <td><code><a href="reference/co2_euets_installations.html">co2_euets_installations()</a></code></td>
-<td>Installation registry</td>
+<td>Installation registry (2012 snapshot, historical)</td>
+</tr>
+<tr>
+<td><code><a href="reference/co2_euets_files.html">co2_euets_files()</a></code></td>
+<td>DG CLIMA file vintages available</td>
 </tr>
 </tbody>
 </table>
@@ -255,15 +271,27 @@
 <tbody>
 <tr>
 <td><code><a href="reference/co2_ukets.html">co2_ukets()</a></code></td>
-<td>UK ETS prices, emissions, allocations</td>
+<td>UK ETS verified emissions and surrenders</td>
 </tr>
 <tr>
-<td><code>co2_rggi()</code></td>
-<td>RGGI prices, emissions, allowance distribution</td>
+<td><code><a href="reference/co2_ukets_allocations.html">co2_ukets_allocations()</a></code></td>
+<td>UK ETS free allocations (installations or aviation)</td>
 </tr>
 <tr>
-<td><code>co2_california()</code></td>
-<td>California Cap-and-Trade prices, emissions, auctions</td>
+<td><code><a href="reference/co2_rggi_allowances.html">co2_rggi_allowances()</a></code></td>
+<td>RGGI allowance distribution by state</td>
+</tr>
+<tr>
+<td><code><a href="reference/co2_rggi_state_proceeds.html">co2_rggi_state_proceeds()</a></code></td>
+<td>RGGI cumulative auction proceeds by state</td>
+</tr>
+<tr>
+<td><code><a href="reference/co2_california_prices.html">co2_california_prices()</a></code></td>
+<td>California Cap-and-Trade auction settlement prices</td>
+</tr>
+<tr>
+<td><code><a href="reference/co2_california_caps.html">co2_california_caps()</a></code></td>
+<td>California overall caps by vintage</td>
 </tr>
 </tbody>
 </table>
@@ -286,12 +314,20 @@
 <td>ICAP Allowance Price Explorer (multi-ETS prices)</td>
 </tr>
 <tr>
+<td><code><a href="reference/co2_icap_systems.html">co2_icap_systems()</a></code></td>
+<td>ICAP systems with date ranges and observation counts</td>
+</tr>
+<tr>
 <td><code><a href="reference/co2_world_bank.html">co2_world_bank()</a></code></td>
-<td>World Bank Carbon Pricing Dashboard</td>
+<td>World Bank Carbon Pricing Dashboard (manual download)</td>
 </tr>
 <tr>
 <td><code><a href="reference/co2_rff_pricing.html">co2_rff_pricing()</a></code></td>
-<td>RFF World Carbon Pricing Database</td>
+<td>RFF World Carbon Pricing Database (frozen at v2025.0.0)</td>
+</tr>
+<tr>
+<td><code><a href="reference/co2_ecp_prices.html">co2_ecp_prices()</a></code></td>
+<td>Emissions-weighted carbon prices and coverage</td>
 </tr>
 </tbody>
 </table>
@@ -300,6 +336,10 @@
 <h3 id="voluntary-markets">Voluntary markets<a class="anchor" aria-label="anchor" href="#voluntary-markets"></a>
 </h3>
 <table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
 <thead><tr>
 <th>Function</th>
 <th>What it returns</th>
@@ -311,11 +351,11 @@
 </tr>
 <tr>
 <td><code><a href="reference/co2_offsets_db.html">co2_offsets_db()</a></code></td>
-<td>CarbonPlan OffsetsDB (REST API)</td>
+<td>CarbonPlan OffsetsDB parquet snapshots</td>
 </tr>
 <tr>
 <td><code><a href="reference/co2_cad_trust.html">co2_cad_trust()</a></code></td>
-<td>Climate Action Data Trust (Article 6-aligned)</td>
+<td>Climate Action Data Trust (not supported, see below)</td>
 </tr>
 </tbody>
 </table>
@@ -346,9 +386,29 @@
 </div>
 </div>
 <div class="section level2">
+<h2 id="source-availability">Source availability<a class="anchor" aria-label="anchor" href="#source-availability"></a>
+</h2>
+<p>Carbon market publishers move files without notice, so this package tracks source health explicitly. As of August 2026:</p>
+<ul>
+<li>
+<strong>World Bank Carbon Pricing Dashboard</strong>: the host rejects non-browser clients (HTTP 403 regardless of user agent). Download the file in a browser and pass it: <code>co2_world_bank(path = "~/Downloads/data_08_2025.xlsx")</code>. The function reports the current URL when the automatic fetch fails.</li>
+<li>
+<strong>RFF World Carbon Pricing Database</strong>: left GitHub on 30 May 2026. <code><a href="reference/co2_rff_pricing.html">co2_rff_pricing()</a></code> reads the last openly published release, <code>v2025.0.0</code>. For newer vintages request a token from the publisher, or use <code><a href="reference/co2_ecp_prices.html">co2_ecp_prices()</a></code>, which stays open and updates with each release.</li>
+<li>
+<strong>CarbonPlan OffsetsDB</strong>: daily publishing became irregular during 2026, with the last snapshot seen on 1 June 2026. <code><a href="reference/co2_offsets_db.html">co2_offsets_db()</a></code> walks back to find the newest available and warns when it is more than a fortnight old.</li>
+<li>
+<strong>Climate Action Data Trust</strong>: no unauthenticated public API. <code><a href="reference/co2_cad_trust.html">co2_cad_trust()</a></code> errors with guidance on self-hosting or requesting partnership access.</li>
+<li>
+<strong>EU ETS installation registry</strong>: DG CLIMA’s only bulk registry file is a snapshot dated 28 August 2012. <code><a href="reference/co2_euets_installations.html">co2_euets_installations()</a></code> warns on every call. For current installation detail, use the identifiers on <code><a href="reference/co2_euets_emissions.html">co2_euets_emissions()</a></code>.</li>
+</ul>
+<p>A weekly GitHub Actions canary exercises every source and opens an issue when one breaks. Run it yourself with:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="ex">Rscript</span> inst/canary/check-endpoints.R</span></code></pre></div>
+</div>
+<div class="section level2">
 <h2 id="caching">Caching<a class="anchor" aria-label="anchor" href="#caching"></a>
 </h2>
 <p>Downloads are cached to <code>tools::R_user_dir("carbondata", "cache")</code> by default. Subsequent calls are instant. Override the location with <code>options(carbondata.cache_dir = "/path/to/dir")</code>. Use <code><a href="reference/co2_clear_cache.html">co2_clear_cache()</a></code> to remove cached files.</p>
+<p>Files that update in place under a stable name (the ICAP price feed, the current-year EEX auction report) carry a one-day cache limit so a stale copy is not served indefinitely. Everything else is cached until you pass <code>refresh = TRUE</code>.</p>
 </div>
 <div class="section level2">
 <h2 id="related-packages">Related packages<a class="anchor" aria-label="anchor" href="#related-packages"></a>
@@ -453,7 +513,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>
