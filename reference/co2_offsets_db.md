@@ -62,7 +62,7 @@ Other voluntary markets:
 # \donttest{
 op <- options(carbondata.cache_dir = tempdir())
 path <- co2_offsets_db("projects")
-#> Warning: ! Newest OffsetsDB snapshot is 62 days old (2026-06-01).
+#> Warning: ! Newest OffsetsDB snapshot is 75 days old (2026-06-01).
 #> ℹ CarbonPlan's publication cadence became irregular in 2026.
 #> ℹ Downloading OffsetsDB projects snapshot from 2026-06-01...
 if (requireNamespace("arrow", quietly = TRUE)) {
