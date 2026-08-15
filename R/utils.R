@@ -95,6 +95,21 @@ co2_download <- function(url, dest, refresh = FALSE, max_age_days = Inf) {
   if (status >= 400L) {
     cli_abort("Download failed with HTTP {status}: {.url {url}}")
   }
+  # A 200 carrying an empty body is not a success. CDNs in front of some
+  # publishers answer automated clients that way instead of sending a 403.
+  # Letting it through is worse than the bad response itself: the empty
+  # file lands in the cache, the next call sees a cached copy and skips
+  # the fetch, and every later call fails in the parser with an error
+  # that says nothing about the download ("no lines available in input").
+  size <- file.size(tmp)
+  if (is.na(size) || size == 0) {
+    cli_abort(c(
+      "Download of {.url {url}} returned HTTP {status} with an empty body.",
+      "i" = "The publisher may be refusing automated clients from this network.",
+      " " = "Retry later, or report at",
+      " " = "https://github.com/charlescoverdale/carbondata/issues."
+    ))
+  }
   if (!file.rename(tmp, dest)) {
     # rename fails across filesystems; fall back to a copy.
     if (!file.copy(tmp, dest, overwrite = TRUE)) {

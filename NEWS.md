@@ -135,6 +135,13 @@ and a weekly canary now watches them.
   a 403 or 404 left the error page sitting in the cache and every later
   call served that instead of retrying. Downloads now land in a
   temporary file and are moved into place only on success.
+* A successful status code carrying an empty body is now treated as a
+  failed download rather than a valid one. Some publishers sit behind a
+  CDN that answers automated clients with an empty 200 instead of a 403,
+  and the zero-byte file was being cached: the next call saw a cached
+  copy, skipped the fetch, and failed in the parser with `no lines
+  available in input`, which points at neither the source nor the
+  network. The download now aborts naming the URL and the status.
 * Downloads accept a cache age limit, applied to the ICAP JSON (1 day)
   and the current-year EEX auction report (1 day). Previously a cached
   copy of a file that updates in place under a stable name was served

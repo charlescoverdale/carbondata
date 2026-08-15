@@ -13,6 +13,14 @@ name: endpoint-canary
 jobs:
   canary:
     runs-on: ubuntu-latest
+
+    # Without issues:write the create-issue step fails with "Resource not
+    # accessible by integration", which fails the whole job and turns the
+    # canary into a weekly "Run failed" email instead of an issue.
+    permissions:
+      contents: read
+      issues: write
+
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
@@ -41,12 +49,45 @@ jobs:
           name: endpoint-report
           path: endpoint-report.md
 
-      - name: Open an issue on failure
+      # The labels below are referenced by the issue steps, and the issues
+      # API rejects a create that names a label the repository does not
+      # have. Creating them here keeps the workflow self-contained.
+      - name: Ensure the canary labels exist
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh label create upstream-breakage --force --color d93f0b \
+            --description "A published data source moved or stopped responding"
+          gh label create automated --force --color ededed \
+            --description "Opened by a scheduled workflow"
+
+      # Reuse one issue rather than opening a fresh one every Monday: an
+      # endpoint stays broken until the publisher fixes it, so a new issue
+      # per run is the same weekly noise in a different inbox.
+      - name: Look for an open canary issue
+        id: existing
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          number=$(gh issue list --state open --label upstream-breakage \
+            --limit 1 --json number --jq '.[0].number // empty')
+          echo "number=$number" >> "$GITHUB_OUTPUT"
+
+      - name: Open or update the breakage issue
         if: steps.probe.outcome == 'failure'
         uses: peter-evans/create-issue-from-file@v5
         with:
+          issue-number: ${{ steps.existing.outputs.number }}
           title: "Endpoint canary failed"
           content-filepath: endpoint-report.md
           labels: |
             upstream-breakage
             automated
+
+      - name: Close the issue once every endpoint recovers
+        if: steps.probe.outcome == 'success' && steps.existing.outputs.number != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue close "${{ steps.existing.outputs.number }}" \
+            --comment "All endpoints responded as expected on $(date -u +%Y-%m-%d)."
