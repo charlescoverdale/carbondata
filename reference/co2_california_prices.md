@@ -36,7 +36,12 @@ Other compliance markets:
 op <- options(carbondata.cache_dir = tempdir())
 prices <- co2_california_prices()
 #> ℹ Downloading California Cap-and-Trade auction prices...
-#> Error in read.table(file = file, header = header, sep = sep, quote = quote,     dec = dec, fill = fill, comment.char = comment.char, ...): no lines available in input
+#> Error in co2_download(url, dest, refresh = refresh): Download of
+#> <https://ww2.arb.ca.gov/sites/default/files/2022-12/nc-allowance_prices.csv>
+#> returned HTTP 202 with an empty body.
+#> ℹ The publisher may be refusing automated clients from this network.
+#>   Retry later, or report at
+#>   https://github.com/charlescoverdale/carbondata/issues.
 options(op)
 # }
 ```

@@ -28,7 +28,7 @@ Other configuration:
 op <- options(carbondata.cache_dir = tempdir())
 co2_cache_info()
 #> $dir
-#> [1] "/tmp/RtmpWiLMmA"
+#> [1] "/tmp/Rtmp1esvxX"
 #> 
 #> $n_files
 #> [1] 2
@@ -41,8 +41,8 @@ co2_cache_info()
 #> 
 #> $files
 #>                                     name size_bytes            modified
-#> 1 bslib-e9b2b13fa612f50d23e4850d93d60d01       4096 2026-08-15 11:00:35
-#> 2                                downlit       4096 2026-08-15 11:00:38
+#> 1 bslib-e9b2b13fa612f50d23e4850d93d60d01       4096 2026-08-15 20:02:39
+#> 2                                downlit       4096 2026-08-15 20:02:41
 #> 
 options(op)
 # }

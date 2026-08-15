@@ -24,7 +24,7 @@ Other configuration:
 # \donttest{
 op <- options(carbondata.cache_dir = tempdir())
 co2_clear_cache()
-#> Removed 4 cached files from /tmp/RtmpWiLMmA.
+#> Removed 2 cached files from /tmp/Rtmp1esvxX.
 options(op)
 # }
 ```
