@@ -44,10 +44,12 @@ package is the recommended suggest.
 \examples{
 \donttest{
 op <- options(carbondata.cache_dir = tempdir())
-path <- co2_offsets_db("projects")
-if (requireNamespace("arrow", quietly = TRUE)) {
+try({
+  path <- co2_offsets_db("projects")
+  if (requireNamespace("arrow", quietly = TRUE)) {
   df <- arrow::read_parquet(path)
-}
+  }
+})
 options(op)
 }
 }

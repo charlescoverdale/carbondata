@@ -29,7 +29,9 @@ exists). For RGGI prices, use \code{\link[=co2_icap_prices]{co2_icap_prices()}} 
 \examples{
 \donttest{
 op <- options(carbondata.cache_dir = tempdir())
-a <- co2_rggi_allowances(year = 2026)
+try({
+  a <- co2_rggi_allowances(year = 2026)
+})
 options(op)
 }
 }

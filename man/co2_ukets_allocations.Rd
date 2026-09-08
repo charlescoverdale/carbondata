@@ -24,7 +24,9 @@ package scrapes the stable publications landing page.
 \examples{
 \donttest{
 op <- options(carbondata.cache_dir = tempdir())
-alloc <- co2_ukets_allocations()
+try({
+  alloc <- co2_ukets_allocations()
+})
 options(op)
 }
 }

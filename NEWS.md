@@ -6,6 +6,20 @@ paths were returning wrong or empty data without raising an error.
 Every source was re-tested against its live endpoint on 2 August 2026,
 and a weekly canary now watches them.
 
+## Examples now fail gracefully when an upstream source is unreachable
+
+Every `\donttest{}` example that reaches an upstream source is wrapped in
+`try()`.
+13 blocks were affected. CRAN runs these in its additional-issues
+donttest check, on build machines the upstream host routinely refuses or
+rate-limits, and an example that could not reach it was an ERROR rather
+than a printed condition. The `options(op)` cache restore stays outside the
+`try()` so it runs either way.
+
+This is the CRAN Repository Policy requirement that a package using an
+internet resource fail gracefully when the resource is unavailable. It is
+the rule obr was archived under on 2026-08-22.
+
 ## Silently wrong results (fixed)
 
 * `co2_euets_emissions()` and `co2_euets_allocations()` gain a `scheme`

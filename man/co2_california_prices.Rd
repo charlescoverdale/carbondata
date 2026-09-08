@@ -21,7 +21,9 @@ Quebec auction.
 \examples{
 \donttest{
 op <- options(carbondata.cache_dir = tempdir())
-prices <- co2_california_prices()
+try({
+  prices <- co2_california_prices()
+})
 options(op)
 }
 }

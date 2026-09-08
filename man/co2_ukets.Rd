@@ -21,7 +21,9 @@ Registry after the 30 April reconciliation deadline.
 \examples{
 \donttest{
 op <- options(carbondata.cache_dir = tempdir())
-uk <- co2_ukets()
+try({
+  uk <- co2_ukets()
+})
 options(op)
 }
 }

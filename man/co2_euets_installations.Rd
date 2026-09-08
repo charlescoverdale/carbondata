@@ -29,7 +29,9 @@ come from the latest annual verified-emissions file.
 \examples{
 \donttest{
 op <- options(carbondata.cache_dir = tempdir())
-inst <- co2_euets_installations(country = "PL")
+try({
+  inst <- co2_euets_installations(country = "PL")
+})
 options(op)
 }
 }

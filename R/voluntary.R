@@ -28,7 +28,9 @@
 #' @examples
 #' \donttest{
 #' op <- options(carbondata.cache_dir = tempdir())
-#' vrod <- co2_vrod()
+#' try({
+#'   vrod <- co2_vrod()
+#' })
 #' options(op)
 #' }
 co2_vrod <- function(sheet = "PROJECTS", refresh = FALSE) {
@@ -118,10 +120,12 @@ co2_vrod <- function(sheet = "PROJECTS", refresh = FALSE) {
 #' @examples
 #' \donttest{
 #' op <- options(carbondata.cache_dir = tempdir())
-#' path <- co2_offsets_db("projects")
-#' if (requireNamespace("arrow", quietly = TRUE)) {
+#' try({
+#'   path <- co2_offsets_db("projects")
+#'   if (requireNamespace("arrow", quietly = TRUE)) {
 #'   df <- arrow::read_parquet(path)
-#' }
+#'   }
+#' })
 #' options(op)
 #' }
 co2_offsets_db <- function(kind = c("projects", "credits"),

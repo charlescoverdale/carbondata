@@ -30,7 +30,9 @@ because it is ~1.5 GB uncompressed and requires LZMA extraction.
 \examples{
 \donttest{
 op <- options(carbondata.cache_dir = tempdir())
-comp <- co2_euets_surrendered(country = "FR")
+try({
+  comp <- co2_euets_surrendered(country = "FR")
+})
 options(op)
 }
 }

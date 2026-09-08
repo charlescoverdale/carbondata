@@ -24,7 +24,9 @@ series.
 \examples{
 \donttest{
 op <- options(carbondata.cache_dir = tempdir())
-ny <- co2_rggi_state_proceeds("NY")
+try({
+  ny <- co2_rggi_state_proceeds("NY")
+})
 options(op)
 }
 }

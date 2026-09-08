@@ -305,7 +305,9 @@ co2_world_bank <- function(path = NULL, sheet = 1L, refresh = FALSE) {
 #' @examples
 #' \donttest{
 #' op <- options(carbondata.cache_dir = tempdir())
-#' uk <- co2_rff_pricing("United_Kingdom")
+#' try({
+#'   uk <- co2_rff_pricing("United_Kingdom")
+#' })
 #' options(op)
 #' }
 co2_rff_pricing <- function(country, version = "v2025.0.0", refresh = FALSE) {
@@ -377,7 +379,9 @@ co2_rff_pricing <- function(country, version = "v2025.0.0", refresh = FALSE) {
 #' @examples
 #' \donttest{
 #' op <- options(carbondata.cache_dir = tempdir())
-#' ecp <- co2_ecp_prices(country = "United Kingdom")
+#' try({
+#'   ecp <- co2_ecp_prices(country = "United Kingdom")
+#' })
 #' options(op)
 #' }
 co2_ecp_prices <- function(level = c("jurisdiction", "sector", "coverage",

@@ -46,7 +46,9 @@ the call errors with that explanation until they restore it.
 \examples{
 \donttest{
 op <- options(carbondata.cache_dir = tempdir())
-ecp <- co2_ecp_prices(country = "United Kingdom")
+try({
+  ecp <- co2_ecp_prices(country = "United Kingdom")
+})
 options(op)
 }
 }

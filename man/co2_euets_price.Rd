@@ -26,7 +26,9 @@ week; each year's file accumulates all auctions for that year.
 \examples{
 \donttest{
 op <- options(carbondata.cache_dir = tempdir())
-prices <- co2_euets_price(year = 2025)
+try({
+  prices <- co2_euets_price(year = 2025)
+})
 options(op)
 }
 }

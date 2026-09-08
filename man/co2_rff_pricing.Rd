@@ -36,7 +36,9 @@ carbon price, which is still served openly, see \code{\link[=co2_ecp_prices]{co2
 \examples{
 \donttest{
 op <- options(carbondata.cache_dir = tempdir())
-uk <- co2_rff_pricing("United_Kingdom")
+try({
+  uk <- co2_rff_pricing("United_Kingdom")
+})
 options(op)
 }
 }

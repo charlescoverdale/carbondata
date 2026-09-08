@@ -19,7 +19,9 @@ allocation channels, by vintage year.
 \examples{
 \donttest{
 op <- options(carbondata.cache_dir = tempdir())
-caps <- co2_california_caps()
+try({
+  caps <- co2_california_caps()
+})
 options(op)
 }
 }

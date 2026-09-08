@@ -10,3 +10,6 @@
 ^llms-full\.txt$
 ^docs$
 ^endpoint-report\.md$
+
+# Claude Code worktrees and local settings: build artefacts, never package source
+^\.claude$

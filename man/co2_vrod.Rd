@@ -31,7 +31,9 @@ CC BY 4.0.
 \examples{
 \donttest{
 op <- options(carbondata.cache_dir = tempdir())
-vrod <- co2_vrod()
+try({
+  vrod <- co2_vrod()
+})
 options(op)
 }
 }

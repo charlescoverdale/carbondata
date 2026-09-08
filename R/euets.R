@@ -216,7 +216,9 @@ co2_euets_allocations <- function(country = NULL, year = NULL,
 #' @examples
 #' \donttest{
 #' op <- options(carbondata.cache_dir = tempdir())
-#' comp <- co2_euets_surrendered(country = "FR")
+#' try({
+#'   comp <- co2_euets_surrendered(country = "FR")
+#' })
 #' options(op)
 #' }
 co2_euets_surrendered <- function(country = NULL, file_year = NULL,
@@ -297,7 +299,9 @@ co2_euets_surrendered <- function(country = NULL, file_year = NULL,
 #' @examples
 #' \donttest{
 #' op <- options(carbondata.cache_dir = tempdir())
-#' inst <- co2_euets_installations(country = "PL")
+#' try({
+#'   inst <- co2_euets_installations(country = "PL")
+#' })
 #' options(op)
 #' }
 co2_euets_installations <- function(country = NULL, refresh = FALSE) {
@@ -354,7 +358,9 @@ co2_euets_installations <- function(country = NULL, refresh = FALSE) {
 #' @examples
 #' \donttest{
 #' op <- options(carbondata.cache_dir = tempdir())
-#' prices <- co2_euets_price(year = 2025)
+#' try({
+#'   prices <- co2_euets_price(year = 2025)
+#' })
 #' options(op)
 #' }
 co2_euets_price <- function(from = NULL, to = NULL, year = NULL,
