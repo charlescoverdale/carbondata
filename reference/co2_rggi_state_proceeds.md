@@ -39,7 +39,9 @@ Other compliance markets:
 ``` r
 # \donttest{
 op <- options(carbondata.cache_dir = tempdir())
-ny <- co2_rggi_state_proceeds("NY")
+try({
+  ny <- co2_rggi_state_proceeds("NY")
+})
 #> ℹ Downloading RGGI NY cumulative proceeds...
 options(op)
 # }

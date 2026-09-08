@@ -47,7 +47,9 @@ Other EU ETS:
 ``` r
 # \donttest{
 op <- options(carbondata.cache_dir = tempdir())
-inst <- co2_euets_installations(country = "PL")
+try({
+  inst <- co2_euets_installations(country = "PL")
+})
 #> ℹ Downloading EU ETS installation registry...
 #> Warning: ! This registry file is a Union Registry snapshot dated 2012-08-28.
 #> ℹ DG CLIMA publishes no newer bulk snapshot; treat as historical.

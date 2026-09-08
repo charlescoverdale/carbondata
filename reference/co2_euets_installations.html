@@ -84,7 +84,9 @@ come from the latest annual verified-emissions file.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="va">op</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>carbondata.cache_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">inst</span> <span class="op">&lt;-</span> <span class="fu">co2_euets_installations</span><span class="op">(</span>country <span class="op">=</span> <span class="st">"PL"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">inst</span> <span class="op">&lt;-</span> <span class="fu">co2_euets_installations</span><span class="op">(</span>country <span class="op">=</span> <span class="st">"PL"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Downloading EU ETS installation registry...</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span><span style="color: #BBBB00;">!</span> This registry file is a Union Registry snapshot dated 2012-08-28.</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> DG CLIMA publishes no newer bulk snapshot; treat as historical.</span>

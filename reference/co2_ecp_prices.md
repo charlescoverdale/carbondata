@@ -72,7 +72,9 @@ Other aggregators:
 ``` r
 # \donttest{
 op <- options(carbondata.cache_dir = tempdir())
-ecp <- co2_ecp_prices(country = "United Kingdom")
+try({
+  ecp <- co2_ecp_prices(country = "United Kingdom")
+})
 #> ℹ Downloading ECP jurisdiction data...
 options(op)
 # }

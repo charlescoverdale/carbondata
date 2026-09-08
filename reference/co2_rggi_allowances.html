@@ -86,7 +86,9 @@ exists). For RGGI prices, use <code><a href="co2_icap_prices.html">co2_icap_pric
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="va">op</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>carbondata.cache_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">a</span> <span class="op">&lt;-</span> <span class="fu">co2_rggi_allowances</span><span class="op">(</span>year <span class="op">=</span> <span class="fl">2026</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">a</span> <span class="op">&lt;-</span> <span class="fu">co2_rggi_allowances</span><span class="op">(</span>year <span class="op">=</span> <span class="fl">2026</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Downloading RGGI allowance distribution for 2026...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> New names:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> `` -&gt; `...2`</span>

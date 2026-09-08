@@ -44,7 +44,9 @@ Other EU ETS:
 ``` r
 # \donttest{
 op <- options(carbondata.cache_dir = tempdir())
-prices <- co2_euets_price(year = 2025)
+try({
+  prices <- co2_euets_price(year = 2025)
+})
 #> ℹ Downloading EEX EUA auction report for 2025...
 options(op)
 # }

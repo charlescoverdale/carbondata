@@ -40,9 +40,11 @@ Other compliance markets:
 ``` r
 # \donttest{
 op <- options(carbondata.cache_dir = tempdir())
-alloc <- co2_ukets_allocations()
+try({
+  alloc <- co2_ukets_allocations()
+})
 #> ℹ Resolving UK ETS installations allocation URL...
-#> ℹ Downloading uk-ets-allocation-table-2026-august.xlsx...
+#> ℹ Downloading uk-ets-allocation-table-august-2026.xlsx...
 options(op)
 # }
 ```

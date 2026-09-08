@@ -60,7 +60,9 @@ Other aggregators:
 ``` r
 # \donttest{
 op <- options(carbondata.cache_dir = tempdir())
-uk <- co2_rff_pricing("United_Kingdom")
+try({
+  uk <- co2_rff_pricing("United_Kingdom")
+})
 #> ℹ Downloading RFF World Carbon Pricing Database for United_Kingdom...
 options(op)
 # }

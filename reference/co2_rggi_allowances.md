@@ -46,7 +46,9 @@ Other compliance markets:
 ``` r
 # \donttest{
 op <- options(carbondata.cache_dir = tempdir())
-a <- co2_rggi_allowances(year = 2026)
+try({
+  a <- co2_rggi_allowances(year = 2026)
+})
 #> ℹ Downloading RGGI allowance distribution for 2026...
 #> New names:
 #> • `` -> `...2`

@@ -42,7 +42,9 @@ Other voluntary markets:
 ``` r
 # \donttest{
 op <- options(carbondata.cache_dir = tempdir())
-vrod <- co2_vrod()
+try({
+  vrod <- co2_vrod()
+})
 #> ℹ Resolving latest VROD release...
 #> ℹ Downloading Voluntary-Registry-Offsets-Database--v2026-06.xlsx (~16 MB)...
 #> New names:

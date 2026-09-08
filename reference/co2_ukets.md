@@ -35,7 +35,9 @@ Other compliance markets:
 ``` r
 # \donttest{
 op <- options(carbondata.cache_dir = tempdir())
-uk <- co2_ukets()
+try({
+  uk <- co2_ukets()
+})
 #> ℹ Resolving UK ETS compliance report URL...
 #> ℹ Downloading UK_ETS_Compliance_Report_Emissions_Surrenders_2026.xlsx...
 options(op)
