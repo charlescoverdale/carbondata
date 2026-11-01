@@ -21,7 +21,7 @@ options(op)
 }
 }
 \seealso{
-Other configuration: 
-\code{\link{co2_cache_info}()}
+Other configuration:
+\code{\link[=co2_cache_info]{co2_cache_info()}}
 }
 \concept{configuration}

@@ -54,8 +54,8 @@ options(op)
 }
 }
 \seealso{
-Other voluntary markets: 
-\code{\link{co2_cad_trust}()},
-\code{\link{co2_vrod}()}
+Other voluntary markets:
+\code{\link[=co2_cad_trust]{co2_cad_trust()}},
+\code{\link[=co2_vrod]{co2_vrod()}}
 }
 \concept{voluntary markets}

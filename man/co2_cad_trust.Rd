@@ -33,8 +33,8 @@ co2_cad_trust()
 }
 }
 \seealso{
-Other voluntary markets: 
-\code{\link{co2_offsets_db}()},
-\code{\link{co2_vrod}()}
+Other voluntary markets:
+\code{\link[=co2_offsets_db]{co2_offsets_db()}},
+\code{\link[=co2_vrod]{co2_vrod()}}
 }
 \concept{voluntary markets}

@@ -13,7 +13,11 @@ year.}
 \item{refresh}{Re-download? Default \code{FALSE}.}
 }
 \value{
-A data frame of allowance distribution by state.
+A data frame with one row per participating state plus a
+\code{"Total"} row: \code{state} and one numeric column per measure in RGGI's
+table (allowance budget, sold at auction, cost containment reserve,
+and so on; the set varies a little by year). Cells RGGI marks \code{N/A}
+are \code{NA}.
 }
 \description{
 Fetches the Regional Greenhouse Gas Initiative (RGGI) annual CO2
@@ -36,11 +40,11 @@ options(op)
 }
 }
 \seealso{
-Other compliance markets: 
-\code{\link{co2_california_caps}()},
-\code{\link{co2_california_prices}()},
-\code{\link{co2_rggi_state_proceeds}()},
-\code{\link{co2_ukets}()},
-\code{\link{co2_ukets_allocations}()}
+Other compliance markets:
+\code{\link[=co2_california_caps]{co2_california_caps()}},
+\code{\link[=co2_california_prices]{co2_california_prices()}},
+\code{\link[=co2_rggi_state_proceeds]{co2_rggi_state_proceeds()}},
+\code{\link[=co2_ukets]{co2_ukets()}},
+\code{\link[=co2_ukets_allocations]{co2_ukets_allocations()}}
 }
 \concept{compliance markets}

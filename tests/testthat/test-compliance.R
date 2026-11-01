@@ -46,3 +46,17 @@ test_that("co2_rggi_state_proceeds accepts lowercase state", {
   df <- co2_rggi_state_proceeds("ny")
   expect_s3_class(df, "data.frame")
 })
+
+test_that("co2_rggi_allowances finds the header below the title block", {
+  skip_on_cran()
+  skip_if_offline()
+  r <- co2_rggi_allowances(year = 2020)
+  expect_equal(names(r)[1], "state")
+  expect_true(all(c("Connecticut", "New York", "Total") %in% r$state))
+  expect_false(any(grepl("[a-z][0-9]$", c(r$state, names(r)))))
+  num <- vapply(r[-1], is.numeric, logical(1))
+  expect_true(all(num))
+  # The Total row is the sum of the states
+  budget <- r[[2]]
+  expect_equal(budget[r$state == "Total"], sum(budget[r$state != "Total"]))
+})

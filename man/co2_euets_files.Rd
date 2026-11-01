@@ -19,11 +19,11 @@ vintages bundled with the package are listed instead.
 co2_euets_files()
 }
 \seealso{
-Other EU ETS: 
-\code{\link{co2_euets_allocations}()},
-\code{\link{co2_euets_emissions}()},
-\code{\link{co2_euets_installations}()},
-\code{\link{co2_euets_price}()},
-\code{\link{co2_euets_surrendered}()}
+Other EU ETS:
+\code{\link[=co2_euets_allocations]{co2_euets_allocations()}},
+\code{\link[=co2_euets_emissions]{co2_euets_emissions()}},
+\code{\link[=co2_euets_installations]{co2_euets_installations()}},
+\code{\link[=co2_euets_price]{co2_euets_price()}},
+\code{\link[=co2_euets_surrendered]{co2_euets_surrendered()}}
 }
 \concept{EU ETS}

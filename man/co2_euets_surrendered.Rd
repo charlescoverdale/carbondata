@@ -37,11 +37,11 @@ options(op)
 }
 }
 \seealso{
-Other EU ETS: 
-\code{\link{co2_euets_allocations}()},
-\code{\link{co2_euets_emissions}()},
-\code{\link{co2_euets_files}()},
-\code{\link{co2_euets_installations}()},
-\code{\link{co2_euets_price}()}
+Other EU ETS:
+\code{\link[=co2_euets_allocations]{co2_euets_allocations()}},
+\code{\link[=co2_euets_emissions]{co2_euets_emissions()}},
+\code{\link[=co2_euets_files]{co2_euets_files()}},
+\code{\link[=co2_euets_installations]{co2_euets_installations()}},
+\code{\link[=co2_euets_price]{co2_euets_price()}}
 }
 \concept{EU ETS}

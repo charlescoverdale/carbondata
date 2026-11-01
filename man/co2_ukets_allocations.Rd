@@ -31,11 +31,11 @@ options(op)
 }
 }
 \seealso{
-Other compliance markets: 
-\code{\link{co2_california_caps}()},
-\code{\link{co2_california_prices}()},
-\code{\link{co2_rggi_allowances}()},
-\code{\link{co2_rggi_state_proceeds}()},
-\code{\link{co2_ukets}()}
+Other compliance markets:
+\code{\link[=co2_california_caps]{co2_california_caps()}},
+\code{\link[=co2_california_prices]{co2_california_prices()}},
+\code{\link[=co2_rggi_allowances]{co2_rggi_allowances()}},
+\code{\link[=co2_rggi_state_proceeds]{co2_rggi_state_proceeds()}},
+\code{\link[=co2_ukets]{co2_ukets()}}
 }
 \concept{compliance markets}

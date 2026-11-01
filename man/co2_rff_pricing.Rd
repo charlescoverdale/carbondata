@@ -49,10 +49,10 @@ Dolphin, G. G., Pollitt, M. G. and Newbery, D. M. (2020).
 \url{doi:10.1093/oep/gpz042}
 }
 \seealso{
-Other aggregators: 
-\code{\link{co2_ecp_prices}()},
-\code{\link{co2_icap_prices}()},
-\code{\link{co2_icap_systems}()},
-\code{\link{co2_world_bank}()}
+Other aggregators:
+\code{\link[=co2_ecp_prices]{co2_ecp_prices()}},
+\code{\link[=co2_icap_prices]{co2_icap_prices()}},
+\code{\link[=co2_icap_systems]{co2_icap_systems()}},
+\code{\link[=co2_world_bank]{co2_world_bank()}}
 }
 \concept{aggregators}

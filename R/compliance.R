@@ -138,7 +138,11 @@ co2_ukets_allocations <- function(sector = c("installations", "aviation"),
 #' @param year Integer year (2009-present). Default is the current
 #'   year.
 #' @param refresh Re-download? Default `FALSE`.
-#' @return A data frame of allowance distribution by state.
+#' @return A data frame with one row per participating state plus a
+#'   `"Total"` row: `state` and one numeric column per measure in RGGI's
+#'   table (allowance budget, sold at auction, cost containment reserve,
+#'   and so on; the set varies a little by year). Cells RGGI marks `N/A`
+#'   are `NA`.
 #' @family compliance markets
 #' @export
 #' @examples
@@ -166,8 +170,51 @@ co2_rggi_allowances <- function(year = NULL, refresh = FALSE) {
   } else {
     cli_inform(c("i" = "Loading {.file {filename}} from cache."))
   }
-  df <- readxl::read_excel(dest)
-  co2_clean_names(as.data.frame(df, stringsAsFactors = FALSE))
+  co2_parse_rggi_allowances(dest, year)
+}
+
+# The RGGI workbook opens with a title block (title, date, a note and a
+# sub-title), so the header is the row whose first cell is "State", not
+# row 1. States follow, then a "Total" row (with a footnote digit in older
+# years, e.g. "Total3"), then notes and a legend.
+co2_parse_rggi_allowances <- function(path, year) {
+  raw <- readxl::read_excel(path, col_names = FALSE, col_types = "text",
+                            .name_repair = "minimal")
+  first <- trimws(as.character(raw[[1]]))
+  hdr <- which(first == "State")[1]
+  if (is.na(hdr)) {
+    cli_abort(c(
+      "Could not find the header row of the RGGI allowance table for {year}.",
+      "i" = "RGGI may have changed the workbook layout."
+    ))
+  }
+  header <- as.character(unlist(raw[hdr, ], use.names = FALSE))
+  rows <- seq.int(hdr + 1L, nrow(raw))
+  label <- first[rows]
+  total <- grep("^Total[0-9]*$", label)[1]
+  if (!is.na(total)) {
+    rows <- rows[seq_len(total)]
+    label <- label[seq_len(total)]
+  }
+  keep <- !is.na(label) & nzchar(label)
+  rows <- rows[keep]
+  # Footnote markers are a digit glued to the last word ("Delaware1",
+  # "Sold at Auction5"); a digit after a lowercase letter is never part of
+  # a name here, while "CO2" (after a capital) is left alone.
+  strip_note <- function(x) sub("(?<=[a-z])[0-9]$", "", x, perl = TRUE)
+  label <- strip_note(sub("^Total[0-9]*$", "Total", label[keep]))
+
+  cols <- which(!is.na(header) & nzchar(header))
+  cols <- cols[cols > 1L]
+  values <- lapply(cols, function(j) {
+    v <- trimws(as.character(raw[[j]][rows]))
+    v[toupper(v) %in% c("N/A", "NA", "")] <- NA
+    suppressWarnings(as.numeric(gsub(",", "", v, fixed = TRUE)))
+  })
+  names(values) <- strip_note(trimws(header[cols]))
+  df <- data.frame(state = label, values, check.names = FALSE,
+                   stringsAsFactors = FALSE)
+  co2_clean_names(df)
 }
 
 #' RGGI cumulative state proceeds by auction

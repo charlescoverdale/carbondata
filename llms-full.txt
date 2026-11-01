@@ -1,8 +1,8 @@
-# carbondata — full API reference
+# carbondata: full API reference
 
-> Unified access to carbon market data from compliance emissions trading systems ('EU ETS', 'UK ETS', 'RGGI', California Cap-and-Trade) and voluntary carbon markets (Verra, Gold Standard, American Carbon Registry, Climate Action Reserve, via the Berkeley Voluntary Registry Offsets Database and the 'CarbonPlan' 'OffsetsDB' API). Includes cross-market price data from the 'International Carbon Action Partnership' ('ICAP') Allowance Price Explorer <https://icapcarbonaction.com/en/ets-prices>, global carbon pricing from the World Bank Carbon Pricing Dashboard <https://carbonpricingdashboard.worldbank.org/>, and the historical 'RFF' World Carbon Pricing Database following Dolphin, Pollitt and Newbery (2020) <doi:10.1038/s41597-022-01659-x>. Data is downloaded from public sources on first use and cached locally.
+> Unified access to carbon market data from compliance emissions trading systems ('EU ETS', 'UK ETS', 'RGGI', California Cap-and-Trade) and voluntary carbon markets (Verra, Gold Standard, American Ca...
 
-- Version: 0.2.0
+- Version: 0.2.1
 - Install: `install.packages("carbondata")`
 - CRAN: https://CRAN.R-project.org/package=carbondata
 - GitHub: https://github.com/charlescoverdale/carbondata
@@ -17,7 +17,7 @@ function with its signature, arguments, return value, and example.
 
 **Inspect the local carbondata cache**
 
-Returns information about the local cache: directory, file count, size, and list of cached files. Useful for debugging stale results or deciding whether to call co2_clear_cache().
+Returns information about the local cache: directory, file count, size, and list of cached files. Useful for debugging stale results or deciding whether to call `co2_clear_cache()`.
 
 **Usage**
 
@@ -27,7 +27,7 @@ co2_cache_info()
 
 **Returns**
 
-A list with elements dir, n_files, size_bytes, size_human, and files (a data frame with name, size_bytes, modified).
+A list with elements `dir`, `n_files`, `size_bytes`, `size_human`, and `files` (a data frame with `name`, `size_bytes`, `modified`).
 
 **Example**
 
@@ -43,7 +43,7 @@ options(op)
 
 **Climate Action Data Trust (not supported)**
 
-CAD Trust is the Chia-Network "cadt" software designed to be self-hosted. There is no unauthenticated public API. To use CAD Trust data you must either:  Self-host a cadt node, or  Arrange a private partnership for API access via https://climateactiondata.org/how-to-connect/
+CAD Trust is the Chia-Network "cadt" software designed to be self-hosted. There is no unauthenticated public API. To use CAD Trust data you must either: Self-host a cadt node, or Arrange a private partnership for API access via https://climateactiondata.org/how-to-connect/
 
 **Usage**
 
@@ -53,7 +53,7 @@ co2_cad_trust(...)
 
 **Arguments**
 
-- `...` — Ignored.
+- `...`: Ignored.
 
 **Returns**
 
@@ -81,7 +81,7 @@ co2_california_caps(refresh = FALSE)
 
 **Arguments**
 
-- `refresh` — Re-download? Default FALSE.
+- `refresh`: Re-download? Default `FALSE`.
 
 **Returns**
 
@@ -91,7 +91,9 @@ A data frame.
 
 ```r
 op <- options(carbondata.cache_dir = tempdir())
-caps <- co2_california_caps()
+try({
+  caps <- co2_california_caps()
+})
 options(op)
 ```
 
@@ -111,17 +113,19 @@ co2_california_prices(refresh = FALSE)
 
 **Arguments**
 
-- `refresh` — Re-download? Default FALSE.
+- `refresh`: Re-download? Default `FALSE`.
 
 **Returns**
 
-A data frame with joint_auction, quarter, settlement_price_usd, reserve_price_usd.
+A data frame with `joint_auction`, `quarter`, `settlement_price_usd`, `reserve_price_usd`.
 
 **Example**
 
 ```r
 op <- options(carbondata.cache_dir = tempdir())
-prices <- co2_california_prices()
+try({
+  prices <- co2_california_prices()
+})
 options(op)
 ```
 
@@ -141,7 +145,7 @@ co2_clear_cache()
 
 **Returns**
 
-Invisibly returns NULL.
+Invisibly returns `NULL`.
 
 **Example**
 
@@ -163,19 +167,19 @@ Fetches the emissions-weighted carbon price dataset published alongside the Worl
 
 ```r
 co2_ecp_prices(
- level = c("jurisdiction", "sector", "coverage", "coverage_sector", "region"),
- gas = "CO2",
- country = NULL,
- refresh = FALSE
+  level = c("jurisdiction", "sector", "coverage", "coverage_sector", "region"),
+  gas = "CO2",
+  country = NULL,
+  refresh = FALSE
 )
 ```
 
 **Arguments**
 
-- `level` — Character. One of "jurisdiction" (default), "sector", "coverage", "coverage_sector", or "region".
-- `gas` — Character. Greenhouse gas. Default "CO2".
-- `country` — Optional character vector of jurisdiction names to filter (matched case-insensitively, e.g. "United Kingdom").
-- `refresh` — Re-download? Default FALSE. Cached copies refresh automatically after 30 days.
+- `level`: Character. One of `"jurisdiction"` (default), `"sector"`, `"coverage"`, `"coverage_sector"`, or `"region"`.
+- `gas`: Character. Greenhouse gas. Default `"CO2"`.
+- `country`: Optional character vector of jurisdiction names to filter (matched case-insensitively, e.g. `"United Kingdom"`).
+- `refresh`: Re-download? Default `FALSE`. Cached copies refresh automatically after 30 days.
 
 **Returns**
 
@@ -185,7 +189,9 @@ A data frame.
 
 ```r
 op <- options(carbondata.cache_dir = tempdir())
-ecp <- co2_ecp_prices(country = "United Kingdom")
+try({
+  ecp <- co2_ecp_prices(country = "United Kingdom")
+})
 options(op)
 ```
 
@@ -195,31 +201,31 @@ options(op)
 
 **EU ETS free allowance allocations**
 
-Returns free allowance allocations per installation per year. Same source file as co2_euets_emissions().
+Returns free allowance allocations per installation per year. Same source file as `co2_euets_emissions()`.
 
 **Usage**
 
 ```r
 co2_euets_allocations(
- country = NULL,
- year = NULL,
- file_year = NULL,
- scheme = c("ets1", "ets2", "all"),
- refresh = FALSE
+  country = NULL,
+  year = NULL,
+  file_year = NULL,
+  scheme = c("ets1", "ets2", "all"),
+  refresh = FALSE
 )
 ```
 
 **Arguments**
 
-- `country` — Optional character vector of two-letter registry codes to filter (e.g. c("DE", "FR", "PL")).
-- `year` — Optional integer vector of emissions years. When NULL, returns all years in the latest published file. Note that the file year (e.g. "2025") refers to publication year; emissions data covers calendar years up to publication year -1.
-- `file_year` — Publication year of the DG CLIMA file to use. Default is the latest year available in the package (see co2_euets_files()).
-- `scheme` — Which trading system to return. "ets1" (default) is the original EU ETS: power, industry, and aviation installations. "ets2" is the separate buildings, road transport, and small industry system that began reporting for compliance year 2024, which DG CLIMA publishes in the same file as one aggregate account per member state. "all" returns both, and is rarely what you want: the two are different systems on different accounting bases, so summing them together double-counts (ETS2 accounts added 981 Mt to the 2024 file, about 45% of the reported total).
-- `refresh` — Logical. Re-download? Default FALSE.
+- `country`: Optional character vector of two-letter registry codes to filter (e.g. `c("DE", "FR", "PL")`).
+- `year`: Optional integer vector of emissions years. When `NULL`, returns all years in the latest published file. Note that the file year (e.g. "2025") refers to publication year; emissions data covers calendar years up to publication year -1.
+- `file_year`: Publication year of the DG CLIMA file to use. Default is the latest year available in the package (see `co2_euets_files()`).
+- `scheme`: Which trading system to return. `"ets1"` (default) is the original EU ETS: power, industry, and aviation installations. `"ets2"` is the separate buildings, road transport, and small industry system that began reporting for compliance year 2024, which DG CLIMA publishes in the same file as one aggregate account per member state. `"all"` returns both, and is rarely what you want: the two are different systems on different accounting bases, so summing them together double-counts (ETS2 accounts added 981 Mt to the 2024 file, about 45% of the reported total).
+- `refresh`: Logical. Re-download? Default `FALSE`.
 
 **Returns**
 
-A data frame with country, installation_id, installation_name, activity, scheme, year, allocation_eua.
+A data frame with `country`, `installation_id`, `installation_name`, `activity`, `scheme`, `year`, `allocation_eua`.
 
 **Example**
 
@@ -241,25 +247,25 @@ Fetches annual verified greenhouse-gas emissions for installations covered by th
 
 ```r
 co2_euets_emissions(
- country = NULL,
- year = NULL,
- file_year = NULL,
- scheme = c("ets1", "ets2", "all"),
- refresh = FALSE
+  country = NULL,
+  year = NULL,
+  file_year = NULL,
+  scheme = c("ets1", "ets2", "all"),
+  refresh = FALSE
 )
 ```
 
 **Arguments**
 
-- `country` — Optional character vector of two-letter registry codes to filter (e.g. c("DE", "FR", "PL")).
-- `year` — Optional integer vector of emissions years. When NULL, returns all years in the latest published file. Note that the file year (e.g. "2025") refers to publication year; emissions data covers calendar years up to publication year -1.
-- `file_year` — Publication year of the DG CLIMA file to use. Default is the latest year available in the package (see co2_euets_files()).
-- `scheme` — Which trading system to return. "ets1" (default) is the original EU ETS: power, industry, and aviation installations. "ets2" is the separate buildings, road transport, and small industry system that began reporting for compliance year 2024, which DG CLIMA publishes in the same file as one aggregate account per member state. "all" returns both, and is rarely what you want: the two are different systems on different accounting bases, so summing them together double-counts (ETS2 accounts added 981 Mt to the 2024 file, about 45% of the reported total).
-- `refresh` — Logical. Re-download? Default FALSE.
+- `country`: Optional character vector of two-letter registry codes to filter (e.g. `c("DE", "FR", "PL")`).
+- `year`: Optional integer vector of emissions years. When `NULL`, returns all years in the latest published file. Note that the file year (e.g. "2025") refers to publication year; emissions data covers calendar years up to publication year -1.
+- `file_year`: Publication year of the DG CLIMA file to use. Default is the latest year available in the package (see `co2_euets_files()`).
+- `scheme`: Which trading system to return. `"ets1"` (default) is the original EU ETS: power, industry, and aviation installations. `"ets2"` is the separate buildings, road transport, and small industry system that began reporting for compliance year 2024, which DG CLIMA publishes in the same file as one aggregate account per member state. `"all"` returns both, and is rarely what you want: the two are different systems on different accounting bases, so summing them together double-counts (ETS2 accounts added 981 Mt to the 2024 file, about 45% of the reported total).
+- `refresh`: Logical. Re-download? Default `FALSE`.
 
 **Returns**
 
-A data frame with columns country, installation_id, installation_name, activity, scheme, year, verified_emissions_tco2e, allocation_eua.
+A data frame with columns `country`, `installation_id`, `installation_name`, `activity`, `scheme`, `year`, `verified_emissions_tco2e`, `allocation_eua`.
 
 **Example**
 
@@ -309,8 +315,8 @@ co2_euets_installations(country = NULL, refresh = FALSE)
 
 **Arguments**
 
-- `country` — Optional two-letter registry codes.
-- `refresh` — Re-download? Default FALSE.
+- `country`: Optional two-letter registry codes.
+- `refresh`: Re-download? Default `FALSE`.
 
 **Returns**
 
@@ -320,7 +326,9 @@ A data frame.
 
 ```r
 op <- options(carbondata.cache_dir = tempdir())
-inst <- co2_euets_installations(country = "PL")
+try({
+  inst <- co2_euets_installations(country = "PL")
+})
 options(op)
 ```
 
@@ -340,19 +348,21 @@ co2_euets_price(from = NULL, to = NULL, year = NULL, refresh = FALSE)
 
 **Arguments**
 
-- `from, to` — Optional character or Date. Date range.
-- `year` — Optional integer year. If supplied, only the file for that year is fetched (faster than from/to).
-- `refresh` — Re-download? Default FALSE.
+- `from, to`: Optional character or Date. Date range.
+- `year`: Optional integer year. If supplied, only the file for that year is fetched (faster than `from`/`to`).
+- `refresh`: Re-download? Default `FALSE`.
 
 **Returns**
 
-A data frame with date, auction_name, contract, status, price_eur, min_bid_eur, max_bid_eur, volume_t.
+A data frame with `date`, `auction_name`, `contract`, `status`, `price_eur`, `min_bid_eur`, `max_bid_eur`, `volume_t`.
 
 **Example**
 
 ```r
 op <- options(carbondata.cache_dir = tempdir())
-prices <- co2_euets_price(year = 2025)
+try({
+  prices <- co2_euets_price(year = 2025)
+})
 options(op)
 ```
 
@@ -372,19 +382,21 @@ co2_euets_surrendered(country = NULL, file_year = NULL, refresh = FALSE)
 
 **Arguments**
 
-- `country` — Optional two-letter registry codes.
-- `file_year` — Publication year of the compliance file. Default is the latest in the package.
-- `refresh` — Re-download? Default FALSE.
+- `country`: Optional two-letter registry codes.
+- `file_year`: Publication year of the compliance file. Default is the latest in the package.
+- `refresh`: Re-download? Default `FALSE`.
 
 **Returns**
 
-A data frame with country, installation_id, installation_name, compliance_code, compliance_status, total_verified_emissions, total_surrendered_allowances, year_of_first_emissions, year_of_last_emissions, account_closure.
+A data frame with `country`, `installation_id`, `installation_name`, `compliance_code`, `compliance_status`, `total_verified_emissions`, `total_surrendered_allowances`, `year_of_first_emissions`, `year_of_last_emissions`, `account_closure`.
 
 **Example**
 
 ```r
 op <- options(carbondata.cache_dir = tempdir())
-comp <- co2_euets_surrendered(country = "FR")
+try({
+  comp <- co2_euets_surrendered(country = "FR")
+})
 options(op)
 ```
 
@@ -404,13 +416,13 @@ co2_icap_prices(jurisdiction = NULL, include_download = FALSE, refresh = FALSE)
 
 **Arguments**
 
-- `jurisdiction` — Optional character vector. Filter by jurisdiction name. Matching is case-insensitive and partial, so "EU ETS" matches "European Union Emissions Trading System (from 2019)". When NULL, returns all. Use co2_icap_systems() to list the exact names.
-- `include_download` — Logical. ICAP publishes a second "(download)" copy of several systems carrying the same prices as the main series. These are excluded by default, because including them duplicates a system in any chart or average. Set TRUE to keep them.
-- `refresh` — Re-download? Default FALSE. The cached copy is refreshed automatically when it is more than a day old.
+- `jurisdiction`: Optional character vector. Filter by jurisdiction name. Matching is case-insensitive and partial, so `"EU ETS"` matches `"European Union Emissions Trading System (from 2019)"`. When `NULL`, returns all. Use `co2_icap_systems()` to list the exact names.
+- `include_download`: Logical. ICAP publishes a second "(download)" copy of several systems carrying the same prices as the main series. These are excluded by default, because including them duplicates a system in any chart or average. Set `TRUE` to keep them.
+- `refresh`: Re-download? Default `FALSE`. The cached copy is refreshed automatically when it is more than a day old.
 
 **Returns**
 
-A data frame with date, jurisdiction, market_type ("primary" auction or "secondary"), price, and currency.
+A data frame with `date`, `jurisdiction`, `market_type` (`"primary"` auction or `"secondary"`), `price`, and `currency`.
 
 **Example**
 
@@ -426,7 +438,7 @@ options(op)
 
 **ICAP systems available**
 
-Lists the emissions trading systems carried by the ICAP Allowance Price Explorer, with the date range and number of observations for each. Use this to find the exact jurisdiction names accepted by co2_icap_prices().
+Lists the emissions trading systems carried by the ICAP Allowance Price Explorer, with the date range and number of observations for each. Use this to find the exact `jurisdiction` names accepted by `co2_icap_prices()`.
 
 **Usage**
 
@@ -436,12 +448,12 @@ co2_icap_systems(include_download = FALSE, refresh = FALSE)
 
 **Arguments**
 
-- `include_download` — Logical. ICAP publishes a second "(download)" copy of several systems carrying the same prices as the main series. These are excluded by default, because including them duplicates a system in any chart or average. Set TRUE to keep them.
-- `refresh` — Re-download? Default FALSE.
+- `include_download`: Logical. ICAP publishes a second "(download)" copy of several systems carrying the same prices as the main series. These are excluded by default, because including them duplicates a system in any chart or average. Set `TRUE` to keep them.
+- `refresh`: Re-download? Default `FALSE`.
 
 **Returns**
 
-A data frame with jurisdiction, currency, market_type, first_date, last_date, and n_obs.
+A data frame with `jurisdiction`, `currency`, `market_type`, `first_date`, `last_date`, and `n_obs`.
 
 **Example**
 
@@ -467,11 +479,11 @@ co2_markets(type = c("all", "compliance", "voluntary"))
 
 **Arguments**
 
-- `type` — Character. One of "all" (default), "compliance", or "voluntary".
+- `type`: Character. One of `"all"` (default), `"compliance"`, or `"voluntary"`.
 
 **Returns**
 
-A data frame with columns market, name, type, coverage_start, jurisdiction, function_name, and notes.
+A data frame with columns `market`, `name`, `type`, `coverage_start`, `jurisdiction`, `function_name`, and `notes`.
 
 **Example**
 
@@ -492,32 +504,34 @@ Fetches the CarbonPlan OffsetsDB daily snapshots of voluntary carbon market proj
 
 ```r
 co2_offsets_db(
- kind = c("projects", "credits"),
- date = NULL,
- max_lookback = 180L,
- refresh = FALSE
+  kind = c("projects", "credits"),
+  date = NULL,
+  max_lookback = 180L,
+  refresh = FALSE
 )
 ```
 
 **Arguments**
 
-- `kind` — Character. "projects" (default) or "credits".
-- `date` — Optional character. ISO date of the snapshot to fetch. The function walks backwards from this date to find a published snapshot. Default Sys.Date().
-- `max_lookback` — Integer. How many days to walk back before giving up. Default 180, because CarbonPlan's publication cadence became irregular during 2026 and the last snapshot seen was 1 June 2026.
-- `refresh` — Re-download? Default FALSE.
+- `kind`: Character. `"projects"` (default) or `"credits"`.
+- `date`: Optional character. ISO date of the snapshot to fetch. The function walks backwards from this date to find a published snapshot. Default `Sys.Date()`.
+- `max_lookback`: Integer. How many days to walk back before giving up. Default 180, because CarbonPlan's publication cadence became irregular during 2026 and the last snapshot seen was 1 June 2026.
+- `refresh`: Re-download? Default `FALSE`.
 
 **Returns**
 
-A file path to the downloaded Parquet file. The caller must have arrow or nanoparquet installed to read it.
+A file path to the downloaded Parquet file. The caller must have `arrow` or `nanoparquet` installed to read it.
 
 **Example**
 
 ```r
 op <- options(carbondata.cache_dir = tempdir())
-path <- co2_offsets_db("projects")
-if (requireNamespace("arrow", quietly = TRUE)) {
- df <- arrow::read_parquet(path)
-}
+try({
+  path <- co2_offsets_db("projects")
+  if (requireNamespace("arrow", quietly = TRUE)) {
+  df <- arrow::read_parquet(path)
+  }
+})
 options(op)
 ```
 
@@ -537,9 +551,9 @@ co2_rff_pricing(country, version = "v2025.0.0", refresh = FALSE)
 
 **Arguments**
 
-- `country` — Character. Country name using underscores (e.g. "United_Kingdom", "Germany", "Antigua_and_Barbuda").
-- `version` — Character. Git tag of the dataset release to read. Default "v2025.0.0", the last openly published snapshot.
-- `refresh` — Re-download? Default FALSE.
+- `country`: Character. Country name using underscores (e.g. `"United_Kingdom"`, `"Germany"`, `"Antigua_and_Barbuda"`).
+- `version`: Character. Git tag of the dataset release to read. Default `"v2025.0.0"`, the last openly published snapshot.
+- `refresh`: Re-download? Default `FALSE`.
 
 **Returns**
 
@@ -549,7 +563,9 @@ A data frame of annual carbon prices by IPCC sector code.
 
 ```r
 op <- options(carbondata.cache_dir = tempdir())
-uk <- co2_rff_pricing("United_Kingdom")
+try({
+  uk <- co2_rff_pricing("United_Kingdom")
+})
 options(op)
 ```
 
@@ -569,18 +585,20 @@ co2_rggi_allowances(year = NULL, refresh = FALSE)
 
 **Arguments**
 
-- `year` — Integer year (2009-present). Default is the current year.
-- `refresh` — Re-download? Default FALSE.
+- `year`: Integer year (2009-present). Default is the current year.
+- `refresh`: Re-download? Default `FALSE`.
 
 **Returns**
 
-A data frame of allowance distribution by state.
+A data frame with one row per participating state plus a `"Total"` row: `state` and one numeric column per measure in RGGI's table (allowance budget, sold at auction, cost containment reserve, and so on; the set varies a little by year). Cells RGGI marks `N/A` are `NA`.
 
 **Example**
 
 ```r
 op <- options(carbondata.cache_dir = tempdir())
-a <- co2_rggi_allowances(year = 2026)
+try({
+  a <- co2_rggi_allowances(year = 2026)
+})
 options(op)
 ```
 
@@ -600,8 +618,8 @@ co2_rggi_state_proceeds(state, refresh = FALSE)
 
 **Arguments**
 
-- `state` — Two-letter state code (one of: CT, DE, MA, MD, ME, NH, NJ, NY, RI, VA, VT).
-- `refresh` — Re-download? Default FALSE.
+- `state`: Two-letter state code (one of: CT, DE, MA, MD, ME, NH, NJ, NY, RI, VA, VT).
+- `refresh`: Re-download? Default `FALSE`.
 
 **Returns**
 
@@ -611,7 +629,9 @@ A data frame.
 
 ```r
 op <- options(carbondata.cache_dir = tempdir())
-ny <- co2_rggi_state_proceeds("NY")
+try({
+  ny <- co2_rggi_state_proceeds("NY")
+})
 options(op)
 ```
 
@@ -631,7 +651,7 @@ co2_ukets(refresh = FALSE)
 
 **Arguments**
 
-- `refresh` — Re-download? Default FALSE.
+- `refresh`: Re-download? Default `FALSE`.
 
 **Returns**
 
@@ -641,7 +661,9 @@ A data frame with one row per account-year.
 
 ```r
 op <- options(carbondata.cache_dir = tempdir())
-uk <- co2_ukets()
+try({
+  uk <- co2_ukets()
+})
 options(op)
 ```
 
@@ -661,8 +683,8 @@ co2_ukets_allocations(sector = c("installations", "aviation"), refresh = FALSE)
 
 **Arguments**
 
-- `sector` — Character. "installations" (default) for stationary installations, "aviation" for aviation allocations.
-- `refresh` — Re-download? Default FALSE.
+- `sector`: Character. `"installations"` (default) for stationary installations, `"aviation"` for aviation allocations.
+- `refresh`: Re-download? Default `FALSE`.
 
 **Returns**
 
@@ -672,7 +694,9 @@ A data frame.
 
 ```r
 op <- options(carbondata.cache_dir = tempdir())
-alloc <- co2_ukets_allocations()
+try({
+  alloc <- co2_ukets_allocations()
+})
 options(op)
 ```
 
@@ -692,8 +716,8 @@ co2_vrod(sheet = "PROJECTS", refresh = FALSE)
 
 **Arguments**
 
-- `sheet` — Character. Which workbook sheet to read. "PROJECTS" (default) is the project register and the only sheet that is a tidy table: it is parsed properly, with the header row located and tally rows dropped. The workbook's other sheets are charts, documentation, and drop-down lookups rather than datasets; naming one reads it verbatim and you get whatever layout it happens to have.
-- `refresh` — Re-download? Default FALSE. Each release has a date-stamped filename; the package scrapes the landing page to find the latest release on each call unless a cached copy exists.
+- `sheet`: Character. Which workbook sheet to read. `"PROJECTS"` (default) is the project register and the only sheet that is a tidy table: it is parsed properly, with the header row located and tally rows dropped. The workbook's other sheets are charts, documentation, and drop-down lookups rather than datasets; naming one reads it verbatim and you get whatever layout it happens to have.
+- `refresh`: Re-download? Default `FALSE`. Each release has a date-stamped filename; the package scrapes the landing page to find the latest release on each call unless a cached copy exists.
 
 **Returns**
 
@@ -703,7 +727,9 @@ A data frame of project-level data.
 
 ```r
 op <- options(carbondata.cache_dir = tempdir())
-vrod <- co2_vrod()
+try({
+  vrod <- co2_vrod()
+})
 options(op)
 ```
 
@@ -723,9 +749,9 @@ co2_world_bank(path = NULL, sheet = 1L, refresh = FALSE)
 
 **Arguments**
 
-- `path` — Optional path to a locally downloaded dashboard .xlsx file. When supplied, no network request is made.
-- `sheet` — Sheet to read. Default 1. The workbook carries several sheets; pass a name or number to read another.
-- `refresh` — Re-download? Default FALSE.
+- `path`: Optional path to a locally downloaded dashboard `.xlsx` file. When supplied, no network request is made.
+- `sheet`: Sheet to read. Default `1`. The workbook carries several sheets; pass a name or number to read another.
+- `refresh`: Re-download? Default `FALSE`.
 
 **Returns**
 

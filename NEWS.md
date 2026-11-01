@@ -1,3 +1,14 @@
+# carbondata 0.2.1
+
+* `co2_rggi_allowances()` returned RGGI's title block as data: the
+  workbook opens with a title, date, note and sub-title, and the function
+  read row 1 as the header, giving columns named "Distribution of 2026
+  CO2 Allowances", "...2" and so on, with every value as text. It now
+  finds the header row (the one starting "State"), returns one row per
+  state plus "Total", makes every measure numeric (`N/A` becomes `NA`),
+  and strips footnote digits from names ("Delaware1", "Sold at
+  Auction5").
+
 # carbondata 0.2.0
 
 Upstream repair release. Six data sources changed their URLs, file

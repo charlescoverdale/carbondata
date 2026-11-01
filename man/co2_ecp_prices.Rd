@@ -58,10 +58,10 @@ sources and methods." \emph{Scientific Data}, 9, 573.
 \url{doi:10.1038/s41597-022-01659-x}
 }
 \seealso{
-Other aggregators: 
-\code{\link{co2_icap_prices}()},
-\code{\link{co2_icap_systems}()},
-\code{\link{co2_rff_pricing}()},
-\code{\link{co2_world_bank}()}
+Other aggregators:
+\code{\link[=co2_icap_prices]{co2_icap_prices()}},
+\code{\link[=co2_icap_systems]{co2_icap_systems()}},
+\code{\link[=co2_rff_pricing]{co2_rff_pricing()}},
+\code{\link[=co2_world_bank]{co2_world_bank()}}
 }
 \concept{aggregators}

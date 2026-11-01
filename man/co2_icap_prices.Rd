@@ -42,10 +42,10 @@ options(op)
 }
 }
 \seealso{
-Other aggregators: 
-\code{\link{co2_ecp_prices}()},
-\code{\link{co2_icap_systems}()},
-\code{\link{co2_rff_pricing}()},
-\code{\link{co2_world_bank}()}
+Other aggregators:
+\code{\link[=co2_ecp_prices]{co2_ecp_prices()}},
+\code{\link[=co2_icap_systems]{co2_icap_systems()}},
+\code{\link[=co2_rff_pricing]{co2_rff_pricing()}},
+\code{\link[=co2_world_bank]{co2_world_bank()}}
 }
 \concept{aggregators}

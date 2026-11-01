@@ -23,10 +23,14 @@ export(co2_ukets)
 export(co2_ukets_allocations)
 export(co2_vrod)
 export(co2_world_bank)
-importFrom(cli,cli_abort)
-importFrom(cli,cli_inform)
-importFrom(cli,cli_warn)
+importFrom(cli,
+  cli_abort,
+  cli_inform,
+  cli_warn
+)
 importFrom(jsonlite,fromJSON)
 importFrom(tools,R_user_dir)
-importFrom(utils,URLencode)
-importFrom(utils,read.csv)
+importFrom(utils,
+  URLencode,
+  read.csv
+)
