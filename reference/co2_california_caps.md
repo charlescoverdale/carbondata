@@ -37,12 +37,6 @@ try({
   caps <- co2_california_caps()
 })
 #> ℹ Downloading California overall caps...
-#> Error in co2_download(url, dest, refresh = refresh) : Download of
-#> <https://ww2.arb.ca.gov/sites/default/files/2025-06/nc-OverallCaps.csv>
-#> returned HTTP 202 with an empty body.
-#> ℹ The publisher may be refusing automated clients from this network.
-#>   Retry later, or report at
-#>   https://github.com/charlescoverdale/carbondata/issues.
 options(op)
 # }
 ```

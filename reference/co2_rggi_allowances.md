@@ -22,7 +22,10 @@ co2_rggi_allowances(year = NULL, refresh = FALSE)
 
 ## Value
 
-A data frame of allowance distribution by state.
+A data frame with one row per participating state plus a `"Total"` row:
+`state` and one numeric column per measure in RGGI's table (allowance
+budget, sold at auction, cost containment reserve, and so on; the set
+varies a little by year). Cells RGGI marks `N/A` are `NA`.
 
 ## Details
 
@@ -50,15 +53,6 @@ try({
   a <- co2_rggi_allowances(year = 2026)
 })
 #> ℹ Downloading RGGI allowance distribution for 2026...
-#> New names:
-#> • `` -> `...2`
-#> • `` -> `...3`
-#> • `` -> `...4`
-#> • `` -> `...5`
-#> • `` -> `...6`
-#> • `` -> `...7`
-#> • `` -> `...8`
-#> • `` -> `...9`
 options(op)
 # }
 ```

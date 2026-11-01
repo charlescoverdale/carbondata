@@ -50,7 +50,7 @@ op <- options(carbondata.cache_dir = tempdir())
 try({
   comp <- co2_euets_surrendered(country = "FR")
 })
-#> ℹ Downloading DG CLIMA compliance file for 2024...
+#> ℹ Downloading DG CLIMA compliance file for 2025...
 options(op)
 # }
 ```
