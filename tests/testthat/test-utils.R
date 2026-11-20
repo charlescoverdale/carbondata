@@ -159,3 +159,39 @@ test_that("co2_download honours max_age_days", {
     co2_download("https://invalid.invalid/x", dest, max_age_days = 30)
   ))
 })
+
+test_that("co2_request sets connect and stall timeouts", {
+  req <- co2_request("https://example.org/data.csv")
+  expect_equal(req$options$connecttimeout, 20L)
+  expect_equal(req$options$low_speed_limit, 1L)
+  expect_equal(req$options$low_speed_time, 60L)
+  expect_null(req$options$timeout_ms)
+})
+
+test_that("bare HEAD-probe requests keep the stall timeouts", {
+  req <- co2_base_request("https://example.org/probe.parquet")
+  expect_equal(req$options$connecttimeout, 20L)
+  expect_equal(req$options$low_speed_time, 60L)
+})
+
+test_that("carbondata.timeout adds a hard cap and is validated", {
+  op <- options(carbondata.timeout = 90)
+  on.exit(options(op), add = TRUE)
+  req <- co2_request("https://example.org/data.csv")
+  expect_equal(req$options$timeout_ms, 90000)
+
+  options(carbondata.timeout = "soon")
+  expect_error(co2_request("https://example.org"), "carbondata.timeout")
+})
+
+test_that("a stalled transfer surfaces as the informative download error", {
+  httr2::local_mocked_responses(function(req) {
+    stop("Timeout was reached [example.org]: Operation too slow")
+  })
+  dest <- tempfile(fileext = ".csv")
+  expect_error(
+    co2_download("https://example.org/data.csv", dest),
+    "Failed to download"
+  )
+  expect_false(file.exists(dest))
+})

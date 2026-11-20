@@ -148,9 +148,10 @@ co2_offsets_db <- function(kind = c("projects", "credits"),
       try_date, kind
     )
     # Bare request: these are tiny HEAD probes against S3 and there may
-    # be a lot of them, so skip the shared throttle and retry policy.
+    # be a lot of them, so skip the shared throttle and retry policy (but
+    # keep the stall timeouts).
     req <- httr2::req_error(
-      httr2::req_user_agent(httr2::request(candidate), .co2_user_agent),
+      co2_base_request(candidate),
       is_error = function(resp) FALSE
     )
     req <- httr2::req_method(req, "HEAD")

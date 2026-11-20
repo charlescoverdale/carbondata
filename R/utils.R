@@ -44,11 +44,40 @@ co2_validate_date <- function(x, arg = "date") {
   "https://github.com/charlescoverdale/carbondata)"
 )
 
-# Build a standard httr2 request with the package User-Agent, retry
-# behaviour, and modest throttling.
-co2_request <- function(url) {
+# Build a bare httr2 request with the package User-Agent and stall
+# protection. httr2 sets no transfer timeout, so a server that accepts
+# the connection and then stops sending would hang the session
+# indefinitely (readecb's live tests hung for over 10 minutes this way on
+# 2026-11-17). These options abort a connection that takes over 20
+# seconds to open, or a transfer that moves under 1 byte per second for
+# 60 seconds, while letting a slow but progressing download (the large
+# EU ETS and CarbonPlan files) finish. Set the `carbondata.timeout`
+# option to a number of seconds for a hard cap on the whole request too.
+# Every request in the package starts here.
+co2_base_request <- function(url) {
   req <- httr2::request(url)
   req <- httr2::req_user_agent(req, .co2_user_agent)
+  req <- httr2::req_options(
+    req,
+    connecttimeout = 20L,
+    low_speed_limit = 1L,
+    low_speed_time = 60L
+  )
+  timeout <- getOption("carbondata.timeout", default = NULL)
+  if (!is.null(timeout)) {
+    if (!is.numeric(timeout) || length(timeout) != 1L || is.na(timeout) ||
+        timeout <= 0) {
+      cli_abort("Option {.code carbondata.timeout} must be a single positive number of seconds.")
+    }
+    req <- httr2::req_timeout(req, timeout)
+  }
+  req
+}
+
+# Build a standard httr2 request with the package User-Agent, stall
+# protection, retry behaviour, and modest throttling.
+co2_request <- function(url) {
+  req <- co2_base_request(url)
   req <- httr2::req_retry(
     req,
     max_tries = 3L,

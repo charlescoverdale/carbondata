@@ -1,3 +1,16 @@
+# carbondata (development version)
+
+* HTTP requests had no timeout. httr2 sets none by default, so a
+  publisher server that accepted the connection and then stopped sending
+  hung the R session indefinitely, for any user calling a download or
+  scrape function, and would stall a CRAN check. Every request now goes
+  through one builder that aborts a connection taking over 20 seconds to
+  open, or a transfer moving under 1 byte per second for 60 seconds,
+  while letting slow but progressing downloads finish. A stall now
+  surfaces as the usual "Failed to download" error. Set
+  `options(carbondata.timeout = <seconds>)` for a hard cap on each
+  request.
+
 # carbondata 0.2.1
 
 * `co2_rggi_allowances()` returned RGGI's title block as data: the
