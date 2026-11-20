@@ -67,7 +67,7 @@ try({
   df <- arrow::read_parquet(path)
   }
 })
-#> Warning: ! Newest OffsetsDB snapshot is 153 days old (2026-06-01).
+#> Warning: ! Newest OffsetsDB snapshot is 172 days old (2026-06-01).
 #> ℹ CarbonPlan's publication cadence became irregular in 2026.
 #> ℹ Downloading OffsetsDB projects snapshot from 2026-06-01...
 options(op)
